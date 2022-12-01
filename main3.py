@@ -62,6 +62,8 @@ app.layout = html.Div([
 def render_content(tab):
     if tab == 'tab-1':
         return html.Div([
+                
+                html.Div([
                 html.H1(children='Bye Dash'),
 
                 html.Div(children='''  Dash: A web application framework for your data.   '''),
@@ -69,6 +71,8 @@ def render_content(tab):
                 html.Div(children='''Dash: Another example for chart '''),
                 dcc.Graph(id='example-graph2', figure=fig2 )
                         ])
+            
+            ])
             
             
             
