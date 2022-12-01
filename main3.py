@@ -17,7 +17,8 @@ tabs_styles = {
 tab_style = {
     'borderBottom': '1px solid #d6d6d6',
     'padding': '6px',
-    'fontWeight': 'bold'
+    'fontWeight': 'bold',
+    'font-family': 'Calibri, sans-serif'
 }
 
 tab_selected_style = {
@@ -25,7 +26,8 @@ tab_selected_style = {
     'borderBottom': '1px solid #d6d6d6',
     'backgroundColor': '#119DFF',
     'color': 'white',
-    'padding': '6px'
+    'padding': '6px',
+    'font-family': 'Calibri, sans-serif'
 }
 
 app.layout = html.Div([
