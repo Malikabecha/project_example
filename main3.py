@@ -1,16 +1,17 @@
 
-from dash.dependencies import Input, Output
 import dash
+
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.express as px
 import pandas as pd
+from dash.dependencies import Input, Output
 
-
+app = Dash(__name__)
 server = app.server
 
 
-app = Dash(__name__)
+
 
 tabs_styles = {
     'height': '44px'
