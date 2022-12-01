@@ -30,6 +30,23 @@ tab_selected_style = {
     'font-family': 'Calibri, sans-serif'
 }
 
+df = pd.DataFrame({
+    "Fruit": ["Apples", "Oranges", "Bananas", "Apples", "Oranges", "Bananas"],
+    "Amount": [4, 1, 2, 2, 4, 5],
+    "City": ["SF", "SF", "SF", "Montreal", "Montreal", "Montreal"]
+})
+
+fig = px.bar(df, x="Fruit", y="Amount", color="City", barmode="group")
+
+df2 = pd.read_csv('https://gist.githubusercontent.com/chriddyp/5d1ea79569ed194d432e56108a04d188/raw/a9f9e8076b837d541398e999dcbac2b2826a81f8/gdp-life-exp-2007.csv')
+
+fig2 = px.scatter(df2, x="gdp per capita", y="life expectancy",
+                 size="population", color="continent", hover_name="country",
+                 log_x=True, size_max=60)
+
+
+
+
 app.layout = html.Div([
     dcc.Tabs(id="tabs-styled-with-inline", value='tab-1', children=[
         dcc.Tab(label='Year Over Year Analysis', value='tab-1', style=tab_style, selected_style=tab_selected_style),
@@ -45,8 +62,16 @@ app.layout = html.Div([
 def render_content(tab):
     if tab == 'tab-1':
         return html.Div([
-            html.H3('Tab content 1')
-        ])
+                html.H1(children='Bye Dash'),
+
+                html.Div(children='''  Dash: A web application framework for your data.   '''),
+                dcc.Graph(id='example-graph',  figure=fig ) , 
+                html.Div(children='''Dash: Another example for chart '''),
+                dcc.Graph(id='example-graph2', figure=fig2 )
+                        ])
+            
+            
+            
     elif tab == 'tab-2':
         return html.Div([
             html.H3('Tab content 2')
