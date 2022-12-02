@@ -62,7 +62,7 @@ pivoted_data.reset_index(inplace = True)
 pivoted_data_sliced = pivoted_data[pivoted_data['year'].isin([2015,2016,2017,2018])]
 pivoted_data_sliced = pivoted_data_sliced.groupby('state').sum(['count'])
 
-pivoted_data_top_10 = pivoted_data_2018.sort_values(by='Overall Homeless' , ascending = False).reset_index()[0:10]
+pivoted_data_top_10 = pivoted_data_sliced.sort_values(by='Overall Homeless' , ascending = False).reset_index()[0:10]
 
 fig3 = px.bar(pivoted_data_top_10, x="Overall Homeless", y="state", orientation='h' , title  = 'Top 10 States with Highest Overall Homelessness' ) #, hover_data=["tip", "size"],)
 fig3.update_layout(yaxis={'categoryorder':'total ascending'})
