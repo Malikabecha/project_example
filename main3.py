@@ -150,6 +150,7 @@ app.layout = html.Div([
 
 @app.callback(Output('tabs-content-inline', 'children'),
               Input('tabs-styled-with-inline', 'value'))
+
 def render_content(tab):
     if tab == 'tab-1':
         return html.Div([
@@ -168,9 +169,10 @@ def render_content(tab):
             
             
     elif tab == 'tab-2':
-        return html.Div([
+        return html.Div([ html.Div([
             dcc.Graph(id='example-graph',  figure=fig_1_state ) , dcc.Graph(id='example-graph',  figure=fig_2_state ) 
-        ])
+        ]) #, style={'display': 'inline-block', 'vertical-align': 'top', 'margin-left': '3vw', 'margin-top': '3vw'}),
+                        ])
     elif tab == 'tab-3':
         return html.Div([
             html.H3('Tab content 3')
