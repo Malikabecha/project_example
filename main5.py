@@ -122,7 +122,7 @@ fig_1_state = px.bar(pivoted_data_sliced.sort_values(by = 'Homelessness Rate' )[
 fig_1_state.update_layout({
 'plot_bgcolor': 'rgba(0, 0, 0, 0)',
 'paper_bgcolor':'rgba(0, 0, 0, 0)',
-} , width = 250 , height  = 250)
+} , width = 450 , height  = 450)
 
 
 
@@ -142,7 +142,7 @@ fig_2_state = go.Figure(data=go.Choropleth(
 
 fig_2_state.update_layout(
     title_text = 'The State-wise distribution of the Homelessness Rate',
-    geo_scope='usa'  , width = 250 , height  = 250
+    geo_scope='usa'  , width = 450 , height  = 450
 )
 
 
