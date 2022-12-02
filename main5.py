@@ -142,7 +142,7 @@ fig_2_state = go.Figure(data=go.Choropleth(
 
 fig_2_state.update_layout(
     title_text = 'The State-wise distribution of the Homelessness Rate',
-    geo_scope='usa'  , width = 450 , height  = 450
+    geo_scope='usa'  , width = 700 , height  = 450
 )
 
 
