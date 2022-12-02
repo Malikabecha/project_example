@@ -215,11 +215,7 @@ def render_content(tab):
             ])
     
     elif tab == 'tab-2':
-         return 
-        
-
-
-                        html.Div(className='row', children=[
+         return html.Div(className='row', children=[
                     html.Div(children=[
                      #   dash_table.DataTable(yoy_homeless_summary.to_dict('records'), [{"name": i, "id": i} for i in yoy_homeless_summary.columns]),
                 #        dash_table.DataTable(
