@@ -106,7 +106,7 @@ pivoted_data_sliced['Homelessness Rate - hover' ]  = pivoted_data_sliced['Homele
 
 ### State Analysis 
 
-fig_1_state = px.bar(pivoted_data_sliced.sort_values(by = 'Homelessness Rate' )[1:10], x="Homelessness Rate", y="state"#, orientation='h' 
+fig_1_state = px.bar(pivoted_data_sliced.sort_values(by = 'Homelessness Rate' )[1:10], x="Homelessness Rate", y="state"
              , title  = 'Top 10 States with Highest Overall Homelessness' , hover_data=['Homelessness Rate - hover'],)
 
 
@@ -171,7 +171,7 @@ def render_content(tab):
     elif tab == 'tab-2':
         return html.Div([ html.Div([
             dcc.Graph(id='example-graph',  figure=fig_1_state ) , dcc.Graph(id='example-graph',  figure=fig_2_state ) 
-        ]) #, style={'display': 'inline-block', 'vertical-align': 'top', 'margin-left': '3vw', 'margin-top': '3vw'}),
+        ]) , style={'display': 'inline-block', 'vertical-align': 'top', 'margin-left': '3vw', 'margin-top': '3vw'}),
                         ])
     elif tab == 'tab-3':
         return html.Div([
