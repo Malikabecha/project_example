@@ -67,7 +67,7 @@ pivoted_data_top_10 = pivoted_data_sliced.sort_values(by='Overall Homeless' , as
 fig3 = px.bar(pivoted_data_top_10, x="Overall Homeless", y="state", orientation='h' , title  = 'Top 10 States with Highest Overall Homelessness' ) #, hover_data=["tip", "size"],)
 fig3.update_layout(yaxis={'categoryorder':'total ascending'})
 
-
+fig4 = px.box(pivoted_data, x="year", y="Overall Homeless" , color = 'year' , title = 'Yearly Distribution of Homeless' ) 
 ###  Project ############################################################################
 
 
@@ -102,7 +102,7 @@ def render_content(tab):
             
     elif tab == 'tab-2':
         return html.Div([
-            dcc.Graph(id='example-graph',  figure=fig3 ) 
+            dcc.Graph(id='example-graph',  figure=fig3 ) , dcc.Graph(id='example-graph',  figure=fig4 ) 
         ])
     elif tab == 'tab-3':
         return html.Div([
