@@ -122,7 +122,7 @@ fig_1_state = px.bar(pivoted_data_sliced.sort_values(by = 'Homelessness Rate' )[
 fig_1_state.update_layout({
 'plot_bgcolor': 'rgba(0, 0, 0, 0)',
 'paper_bgcolor':'rgba(0, 0, 0, 0)',
-})
+} , width = 250 , height  = 250)
 
 
 
@@ -142,7 +142,7 @@ fig_2_state = go.Figure(data=go.Choropleth(
 
 fig_2_state.update_layout(
     title_text = 'The State-wise distribution of the Homelessness Rate',
-    geo_scope='usa'
+    geo_scope='usa'  , width = 250 , height  = 250
 )
 
 
@@ -150,7 +150,7 @@ fig_2_state.update_layout(
 
 yoy_analysis = dbc.Container(dcc.Graph(figure={"data": [{"x": [1, 2, 3], "y": [1, 4, 9]}]}))
 state_level_analysis = dbc.Container([
-            dbc.Row([  dbc.Col([ dcc.Graph(id="fig_2_state",figure =fig_2_state ,  style={'display': 'inline-block'}) ,  ]) ,      dbc.Col([ dcc.Graph(id="fig_1_state",figure =fig ,  style={'display': 'inline-block'}),  ])     ]),
+            dbc.Row([  dbc.Col([ dcc.Graph(id="fig_2_state",figure =fig_2_state ,  style={'display': 'inline-block'}) ,  ]) ,      dbc.Col([ dcc.Graph(id="fig_1_state",figure =fig_1_state ,  style={'display': 'inline-block'}),  ])     ]),
             dbc.Row([  dbc.Col([ html.H3("Contributions to prediction:"),  ]), ]),
             dbc.Row([  dbc.Col([ html.H3("Every tree in the Random Forest:"), ]), ])
         ])
