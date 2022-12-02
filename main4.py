@@ -219,8 +219,8 @@ def render_content(tab):
     
     
     html.Div(children=[
-         dash_table.DataTable(yoy_homeless_summary.to_dict('records'), [{"name": i, "id": i} for i in yoy_homeless_summary.columns] ,  style={'display': 'inline-block'})),
-
+        dash_table.DataTable(yoy_homeless_summary.to_dict('records'), [{"name": i, "id": i} for i in yoy_homeless_summary.columns]),
+        
         dcc.Graph(id="fig_2_state",figure =fig_2_state ,  style={'display': 'inline-block'}),
         dcc.Graph(id="fig_1_state",figure =fig_1_state , style={'display': 'inline-block'})
     ])
