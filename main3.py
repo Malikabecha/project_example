@@ -170,7 +170,7 @@ def render_content(tab):
     html.Div(children=[
 
         # first column of first row
-        html.Div(children=[
+        html.Div([
             dcc.Graph(id='example-graph',  figure=fig_1_state ), ], style={'display': 'inline-block', 'vertical-align': 'top', 'margin-left': '3vw', 'margin-top': '3vw'}),
 
         # second column of first row
