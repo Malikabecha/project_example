@@ -217,7 +217,7 @@ def render_content(tab):
     elif tab == 'tab-2':
          return 
         
-         html.Div([
+
 
                         html.Div(className='row', children=[
                     html.Div(children=[
@@ -232,15 +232,26 @@ def render_content(tab):
                     ])
                 ])
                           
-         ])
+   
+
+
 
 
 
 
     elif tab == 'tab-3':
-        return html.Div([
-            html.H3('Tab content 3')
-        ])
+        return html.Div(
+    [
+        dbc.Row(dbc.Col(html.Div("A single column"))),
+        dbc.Row(
+            [
+                dbc.Col(html.Div("One of three columns")),
+                dbc.Col(html.Div("One of three columns")),
+                dbc.Col(html.Div("One of three columns")),
+            ]
+        ),
+    ]
+)
 
     
 if __name__ == '__main__':
