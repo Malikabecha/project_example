@@ -235,8 +235,9 @@ def render_content(tab):
 
 
 
+
     elif tab == 'tab-3':
-        return html.Div(
+        return html.Container(
     [
         dbc.Row(dbc.Col(html.Div("A single column"))),
         dbc.Row(
