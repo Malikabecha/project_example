@@ -29,3 +29,4 @@ six==1.13.0
 tenacity==8.1.0
 Werkzeug==0.16.0
 census==0.8.19
+ipywidgets==8.0.2
