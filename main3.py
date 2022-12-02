@@ -45,6 +45,30 @@ fig2 = px.scatter(df2, x="gdp per capita", y="life expectancy",
                  log_x=True, size_max=60)
 
 
+###  Project ############################################################################
+data = pd.read_csv(r'C:\Users\asus\Downloads/Point_in_Time_Estimates_of_Homelessness_in_the_US_by_State.csv')
+
+data.rename(columns = {'count_type' : 'homeless_type'} , inplace = True)
+data = data[data['state']!= 'MP']
+data = data[data['state']!='Total']
+data['count'] = data['count'].astype(int)
+
+
+pivoted_data = data.pivot_table(values='count', index = ['year' , 'state' ],   columns= 'homeless_type',    aggfunc= ['sum'],   margins = False)
+pivoted_data.columns = pivoted_data.columns.to_series().str.join('')
+pivoted_data.columns = pivoted_data.columns.str.replace("sum", "")
+pivoted_data.reset_index(inplace = True)
+
+pivoted_data_sliced = pivoted_data[pivoted_data['year'].isin([2015,2016,2017,2018])]
+pivoted_data_sliced = pivoted_data_sliced.groupby('state').sum(['count'])
+
+pivoted_data_top_10 = pivoted_data_2018.sort_values(by='Overall Homeless' , ascending = False).reset_index()[0:10]
+
+fig3 = px.bar(pivoted_data_top_10, x="Overall Homeless", y="state", orientation='h' , title  = 'Top 10 States with Highest Overall Homelessness' ) #, hover_data=["tip", "size"],)
+fig3.update_layout(yaxis={'categoryorder':'total ascending'})
+
+
+###  Project ############################################################################
 
 
 app.layout = html.Div([
@@ -78,7 +102,7 @@ def render_content(tab):
             
     elif tab == 'tab-2':
         return html.Div([
-            html.H3('Tab content 2')
+            dcc.Graph(id='example-graph',  figure=fig3 ) 
         ])
     elif tab == 'tab-3':
         return html.Div([
