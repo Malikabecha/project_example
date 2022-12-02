@@ -151,33 +151,40 @@ app.layout = html.Div([
 @app.callback(Output('tabs-content-inline', 'children'),
               Input('tabs-styled-with-inline', 'value'))
 
+
+
+
+@app.callback(Output('tabs-content-inline', 'children'),
+              Input('tabs-styled-with-inline', 'value'))
+
 def render_content(tab):
     if tab == 'tab-1':
-        return dbc.Container(
-       [
-      
-           dbc.Row(
-               [dbc.Col([fig_2_state]),
-                dbc.Col([fig_1_state]),],),
-        ],
-        fluid = True,
-        className = "dbc",)
+        return html.Div([                
+                html.Div([
+                html.H1(children='Bye Dash'),
+                html.Div(children='''  Dash: A web application framework for your data.   '''),
+                dcc.Graph(id='example-graph',  figure=fig ) , 
+                html.Div(children='''Dash: Another example for chart '''),
+                dcc.Graph(id='example-graph2', figure=fig2 )
+                        ])
+            
+            ])
     
     elif tab == 'tab-2':
-         return html.Div([
-            dcc.Graph(id='example-graph',  figure=fig_1_state ) , dcc.Graph(id='example-graph',  figure=fig_2_state ) 
-            ])
+         return html.Div(className='row', children=[
+    
+    
+    html.Div(children=[
+        dcc.Graph(id="fig_2_state",figure =fig_2_state ,  style={'display': 'inline-block'}),
+        dcc.Graph(id="fig_1_state",figure =fig_1_state , style={'display': 'inline-block'})
+    ])
+])
                           
     elif tab == 'tab-3':
         return html.Div([
-          
-          
-          
             html.H3('Tab content 3')
-          
-          
-          
         ])
+
     
 if __name__ == '__main__':
     app.run_server(debug=True, port=8080)
