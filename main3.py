@@ -167,7 +167,7 @@ def render_content(tab):
             
         #    ])
             
-    html.Div(children=[
+    html.Div([
 
         # first column of first row
         html.Div([
