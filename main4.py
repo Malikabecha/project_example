@@ -82,7 +82,26 @@ state_codes = {
 state_codes = {v: k for k, v in state_codes.items()}
 population_table['state'] = population_table['state'].map(state_codes) 
 
+
+
 #################################################
+
+#pivoted_data = data.pivot_table(values='count', index = ['year' , 'state' ],   columns= 'homeless_type',    aggfunc= ['sum'],   margins = False)
+#pivoted_data.columns = pivoted_data.columns.to_series().str.join('')
+#pivoted_data.columns = pivoted_data.columns.str.replace("sum", "")
+#pivoted_data.reset_index(inplace = True)
+
+#pivoted_data.columns
+#pivoted_data_sliced = pivoted_data[pivoted_data['year'].isin([2018])].reset_index()
+
+#pivoted_data_sliced  = pd.merge(pivoted_data_sliced , population_table , left_on = ['year' , 'state'] , right_on = ['year' , 'state'] , how = 'left')
+
+
+
+#pivoted_data_sliced['Homelessness Rate' ] = pivoted_data_sliced['Overall Homeless' ]/ pivoted_data_sliced['population' ]
+#pivoted_data_sliced['Homelessness Rate - hover' ]  = pivoted_data_sliced['Homelessness Rate' ].apply(lambda x : '{:.2%}'.format(x))
+
+####################
 
 
 
@@ -92,8 +111,11 @@ pivoted_data.columns = pivoted_data.columns.to_series().str.join('')
 pivoted_data.columns = pivoted_data.columns.str.replace("sum", "")
 pivoted_data.reset_index(inplace = True)
 
-pivoted_data.columns
-pivoted_data_sliced = pivoted_data[pivoted_data['year'].isin([2018])].reset_index()
+states_dictionary = pd.read_csv(r'https://raw.githubusercontent.com/cphalpert/census-regions/master/us%20census%20bureau%20regions%20and%20divisions.csv')
+pivoted_data = pd.merge(pivoted_data , states_dictionary, left_on = 'state' ,right_on = 'State Code' , how = 'left')
+
+selected_year = 2018
+pivoted_data_sliced = pivoted_data[pivoted_data['year'].isin([selected_year])].reset_index()
 
 pivoted_data_sliced  = pd.merge(pivoted_data_sliced , population_table , left_on = ['year' , 'state'] , right_on = ['year' , 'state'] , how = 'left')
 
@@ -104,6 +126,33 @@ pivoted_data_sliced['Homelessness Rate - hover' ]  = pivoted_data_sliced['Homele
 
 
 
+pivoted_data_sliced['Homelessness Percent by region'] = pivoted_data_sliced['Overall Homeless']/pivoted_data_sliced['Overall Homeless'].sum()
+
+#######
+
+yoy_homeless = pd.merge(pivoted_data_sliced.groupby('Region').sum('Overall Homeless')['Overall Homeless'], 
+                        pivoted_data[pivoted_data['year'].isin([selected_year-1])][['Region' , 'Overall Homeless']].groupby('Region').sum('Overall Homeless')['Overall Homeless'], 
+                        how = 'left',
+                        on = 'Region').rename(columns = {'Overall Homeless_y':'Prior Year Overall Homeless',
+                                                        'Overall Homeless_x':'Selected Year Overall Homeless'})
+                        
+yoy_homeless['Homelessness Percent by region'] = yoy_homeless['Selected Year Overall Homeless']/yoy_homeless['Selected Year Overall Homeless'].sum()         
+yoy_homeless['Homelessness Percent by region']=yoy_homeless['Homelessness Percent by region'].apply(lambda x : '{:.2%}'.format(x))
+
+yoy_homeless = yoy_homeless.sort_values(by = 'Selected Year Overall Homeless' , ascending = False)
+yoy_homeless[['Selected Year Overall Homeless' ,'Prior Year Overall Homeless']] = yoy_homeless[['Selected Year Overall Homeless' ,'Prior Year Overall Homeless']].apply(lambda x : x.astype(int))
+
+yoy_homeless['Percent change vs prior Year'] = (yoy_homeless['Selected Year Overall Homeless']/yoy_homeless['Prior Year Overall Homeless']) -1
+
+yoy_homeless['Percent change vs prior Year']  = yoy_homeless['Percent change vs prior Year'].apply(lambda x : '{:.2%}'.format(x))
+yoy_homeless
+
+
+yoy_homeless_summary = yoy_homeless[['Homelessness Percent by region' , 'Selected Year Overall Homeless'  , 'Percent change vs prior Year']]
+
+yoy_homeless_summary
+
+#########
 ### State Analysis 
 
 fig_1_state = px.bar(pivoted_data_sliced.sort_values(by = 'Homelessness Rate' )[1:10], x="Homelessness Rate", y="state"
@@ -170,6 +219,8 @@ def render_content(tab):
     
     
     html.Div(children=[
+         dash_table.DataTable(yoy_homeless_summary.to_dict('records'), [{"name": i, "id": i} for i in yoy_homeless_summary.columns]),
+
         dcc.Graph(id="fig_2_state",figure =fig_2_state ,  style={'display': 'inline-block'}),
         dcc.Graph(id="fig_1_state",figure =fig_1_state , style={'display': 'inline-block'})
     ])
