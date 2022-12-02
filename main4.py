@@ -215,22 +215,29 @@ def render_content(tab):
             ])
     
     elif tab == 'tab-2':
-         return html.Div(className='row', children=[
-    
-    
-    html.Div(children=[
-     #   dash_table.DataTable(yoy_homeless_summary.to_dict('records'), [{"name": i, "id": i} for i in yoy_homeless_summary.columns]),
-        dash_table.DataTable(
-            id="table",
-            columns=[{"name": str(i), "id": str(i)} for i in yoy_homeless_summary.columns],
-            data=yoy_homeless_summary.to_dict("records"),
-        ),
-        dcc.Graph(id="fig_2_state",figure =fig_2_state ,  style={'display': 'inline-block'}),
-        dcc.Graph(id="fig_1_state",figure =fig_1_state , style={'display': 'inline-block'})
-    ])
-])
+         return 
+        
+         html.Div([
+
+                        html.Div(className='row', children=[
+                    html.Div(children=[
+                     #   dash_table.DataTable(yoy_homeless_summary.to_dict('records'), [{"name": i, "id": i} for i in yoy_homeless_summary.columns]),
+                #        dash_table.DataTable(
+                #            id="table",
+                #            columns=[{"name": str(i), "id": str(i)} for i in yoy_homeless_summary.columns],
+                #            data=yoy_homeless_summary.to_dict("records"),
+                #        ),
+                        dcc.Graph(id="fig_2_state",figure =fig_2_state ,  style={'display': 'inline-block'}),
+                        dcc.Graph(id="fig_1_state",figure =fig_1_state , style={'display': 'inline-block'})
+                    ])
+                ])
                           
-    elif tab == 'tab-3':
+         ])
+
+
+
+
+elif tab == 'tab-3':
         return html.Div([
             html.H3('Tab content 3')
         ])
