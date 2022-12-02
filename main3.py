@@ -48,6 +48,8 @@ fig2 = px.scatter(df2, x="gdp per capita", y="life expectancy",
 
 
 ###  Project ############################################################################
+
+
 data = pd.read_csv(r'https://storage.googleapis.com/assignment-data/Point_in_Time_Estimates_of_Homelessness_in_the_US_by_State.csv')
 
 data.rename(columns = {'count_type' : 'homeless_type'} , inplace = True)
@@ -56,20 +58,83 @@ data = data[data['state']!='Total']
 data['count'] = data['count'].astype(int)
 
 
+
+
+
+######################### population from census
+
+population_table = pd.DataFrame()
+for i in range(2009,2019):
+    c = Census("52b7c26667eed84927ca68b61e8cd4b3ff00f5f0" , year = i)
+    
+    df=pd.DataFrame(c.acs5.state('B01001_001E', Census.ALL))
+    df['year']= i
+    population_table = population_table.append(df)
+    
+population_table.rename(columns = {'B01001_001E':'population'} , inplace = True)
+
+state_codes = {
+    'WA': '53', 'DE': '10', 'DC': '11', 'WI': '55', 'WV': '54', 'HI': '15','FL': '12', 'WY': '56', 'PR': '72', 'NJ': '34', 'NM': '35', 'TX': '48',
+    'LA': '22', 'NC': '37', 'ND': '38', 'NE': '31', 'TN': '47', 'NY': '36','PA': '42', 'AK': '02', 'NV': '32', 'NH': '33', 'VA': '51', 'CO': '08',
+    'CA': '06', 'AL': '01', 'AR': '05', 'VT': '50', 'IL': '17', 'GA': '13','IN': '18', 'IA': '19', 'MA': '25', 'AZ': '04', 'ID': '16', 'CT': '09',
+    'ME': '23', 'MD': '24', 'OK': '40', 'OH': '39', 'UT': '49', 'MO': '29','MN': '27', 'MI': '26', 'RI': '44', 'KS': '20', 'MT': '30', 'MS': '28',
+    'SC': '45', 'KY': '21', 'OR': '41', 'SD': '46'}
+state_codes = {v: k for k, v in state_codes.items()}
+population_table['state'] = population_table['state'].map(state_codes) 
+
+#################################################
+
+
+
+
 pivoted_data = data.pivot_table(values='count', index = ['year' , 'state' ],   columns= 'homeless_type',    aggfunc= ['sum'],   margins = False)
 pivoted_data.columns = pivoted_data.columns.to_series().str.join('')
 pivoted_data.columns = pivoted_data.columns.str.replace("sum", "")
 pivoted_data.reset_index(inplace = True)
 
-pivoted_data_sliced = pivoted_data[pivoted_data['year'].isin([2015,2016,2017,2018])]
-pivoted_data_sliced = pivoted_data_sliced.groupby('state').sum(['count'])
+pivoted_data.columns
+pivoted_data_sliced = pivoted_data[pivoted_data['year'].isin([2018])].reset_index()
 
-pivoted_data_top_10 = pivoted_data_sliced.sort_values(by='Overall Homeless' , ascending = False).reset_index()[0:10]
+pivoted_data_sliced  = pd.merge(pivoted_data_sliced , population_table , left_on = ['year' , 'state'] , right_on = ['year' , 'state'] , how = 'left')
 
-fig3 = px.bar(pivoted_data_top_10, x="Overall Homeless", y="state", orientation='h' , title  = 'Top 10 States with Highest Overall Homelessness' ) #, hover_data=["tip", "size"],)
-fig3.update_layout(yaxis={'categoryorder':'total ascending'})
 
-fig4 = px.box(pivoted_data, x="year", y="Overall Homeless" , color = 'year' , title = 'Yearly Distribution of Homeless' ) 
+
+pivoted_data_sliced['Homelessness Rate' ] = pivoted_data_sliced['Overall Homeless' ]/ pivoted_data_sliced['population' ]
+pivoted_data_sliced['Homelessness Rate - hover' ]  = pivoted_data_sliced['Homelessness Rate' ].apply(lambda x : '{:.2%}'.format(x))
+
+
+
+### State Analysis 
+
+fig_1_state = px.bar(pivoted_data_sliced.sort_values(by = 'Homelessness Rate' )[1:10], x="Homelessness Rate", y="state"#, orientation='h' 
+             , title  = 'Top 10 States with Highest Overall Homelessness' , hover_data=['Homelessness Rate - hover'],)
+
+
+fig_1_state.update_layout({
+'plot_bgcolor': 'rgba(0, 0, 0, 0)',
+'paper_bgcolor':'rgba(0, 0, 0, 0)',
+})
+
+
+
+fig_2_state = go.Figure(data=go.Choropleth(
+    locations=pivoted_data_sliced['state'], 
+    z = pivoted_data_sliced['Homelessness Rate'], 
+    locationmode = 'USA-states',
+#    colorscale = 'Reds'
+    hovertemplate = 'Overall Homeless: %{Overall Homeless}'
+
+    ,text=pivoted_data_sliced['Homelessness Rate - hover'], 
+    marker_line_color='white' 
+))
+
+fig_2_state.update_layout(
+    title_text = 'The State-wise distribution of the Homelessness Rate',
+    geo_scope='usa'
+)
+
+
+#
 ###  Project ############################################################################
 
 
@@ -104,7 +169,7 @@ def render_content(tab):
             
     elif tab == 'tab-2':
         return html.Div([
-            dcc.Graph(id='example-graph',  figure=fig3 ) , dcc.Graph(id='example-graph',  figure=fig4 ) 
+            dcc.Graph(id='example-graph',  figure=fig_1_state ) , dcc.Graph(id='example-graph',  figure=fig_2_state ) 
         ])
     elif tab == 'tab-3':
         return html.Div([
