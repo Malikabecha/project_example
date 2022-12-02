@@ -152,11 +152,6 @@ app.layout = html.Div([
               Input('tabs-styled-with-inline', 'value'))
 
 
-
-
-@app.callback(Output('tabs-content-inline', 'children'),
-              Input('tabs-styled-with-inline', 'value'))
-
 def render_content(tab):
     if tab == 'tab-1':
         return html.Div([                
