@@ -169,7 +169,7 @@ def render_content(tab):
             
             
     elif tab == 'tab-2':
-        return html.Div([ html.Div([
+        return html.Div( children= [ html.Div([
             dcc.Graph(id='example-graph',  figure=fig_1_state ) , dcc.Graph(id='example-graph',  figure=fig_2_state ) 
         ]) , style={'display': 'inline-block', 'vertical-align': 'top', 'margin-left': '3vw', 'margin-top': '3vw'}),
                         ])
