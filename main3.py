@@ -153,46 +153,26 @@ app.layout = html.Div([
 
 def render_content(tab):
     if tab == 'tab-1':
-        return 
-           #     html.Div([
-                
-           #     html.Div([
-           #     html.H1(children='Bye Dash'),
-
-           #     html.Div(children='''  Dash: A web application framework for your data.   '''),
-          #      dcc.Graph(id='example-graph',  figure=fig ) , 
-          #      html.Div(children='''Dash: Another example for chart '''),
-          #      dcc.Graph(id='example-graph2', figure=fig2 )
-         #               ])
+        return html.Div([                
+                html.Div([
+                html.H1(children='Bye Dash'),
+                html.Div(children='''  Dash: A web application framework for your data.   '''),
+                dcc.Graph(id='example-graph',  figure=fig ) , 
+                html.Div(children='''Dash: Another example for chart '''),
+                dcc.Graph(id='example-graph2', figure=fig2 )
+                        ])
             
-        #    ])
-            
-    html.Div([
-
-        # first column of first row
-        html.Div([
-            dcc.Graph(id='example-graph',  figure=fig_1_state ), ], style={'display': 'inline-block', 'vertical-align': 'top', 'margin-left': '3vw', 'margin-top': '3vw'}),
-
-        # second column of first row
-            dcc.Graph(id='example-graph',  figure=fig_1_state ) , style={'display': 'inline-block', 'vertical-align': 'top', 'margin-left': '3vw', 'margin-top': '3vw'}),
-
-
-    ], className='row'),
-
-            
-        
-        
-        
+            ])
+    
     elif tab == 'tab-2':
-        return html.Div([ 
+         return html.Div([
             dcc.Graph(id='example-graph',  figure=fig_1_state ) , dcc.Graph(id='example-graph',  figure=fig_2_state ) 
-        
-                        ]) 
+            ])
+                          
     elif tab == 'tab-3':
         return html.Div([
             html.H3('Tab content 3')
         ])
-  
     
 if __name__ == '__main__':
     app.run_server(debug=True, port=8080)
