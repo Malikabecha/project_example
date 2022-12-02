@@ -46,7 +46,7 @@ fig2 = px.scatter(df2, x="gdp per capita", y="life expectancy",
 
 
 ###  Project ############################################################################
-data = pd.read_csv(r'C:\Users\asus\Downloads/Point_in_Time_Estimates_of_Homelessness_in_the_US_by_State.csv')
+data = pd.read_csv(r'https://storage.googleapis.com/assignment-data/Point_in_Time_Estimates_of_Homelessness_in_the_US_by_State.csv')
 
 data.rename(columns = {'count_type' : 'homeless_type'} , inplace = True)
 data = data[data['state']!= 'MP']
