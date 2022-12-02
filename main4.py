@@ -237,7 +237,7 @@ def render_content(tab):
 
 
 
-elif tab == 'tab-3':
+    elif tab == 'tab-3':
         return html.Div([
             html.H3('Tab content 3')
         ])
