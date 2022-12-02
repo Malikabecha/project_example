@@ -4,6 +4,8 @@ from dash import Dash, dcc, html
 import plotly.express as px
 import pandas as pd
 from dash.dependencies import Input, Output
+from census import Census
+
 
 app = Dash(__name__)
 server = app.server
