@@ -1,3 +1,4 @@
+
 import dash
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
@@ -12,22 +13,7 @@ import plotly.graph_objects as go
 
 
 
-df = pd.DataFrame({
-    "Fruit": ["Apples", "Oranges", "Bananas", "Apples", "Oranges", "Bananas"],
-    "Amount": [4, 1, 2, 2, 4, 5],
-    "City": ["SF", "SF", "SF", "Montreal", "Montreal", "Montreal"]
-})
-
-fig = px.bar(df, x="Fruit", y="Amount", color="City", barmode="group")
-
-df2 = pd.read_csv('https://gist.githubusercontent.com/chriddyp/5d1ea79569ed194d432e56108a04d188/raw/a9f9e8076b837d541398e999dcbac2b2826a81f8/gdp-life-exp-2007.csv')
-
-fig2 = px.scatter(df2, x="gdp per capita", y="life expectancy",
-                 size="population", color="continent", hover_name="country",
-                 log_x=True, size_max=60)
-
-
-###  Project ############################################################################
+#####################################  Cleaning steps ############################################################################
 
 
 data = pd.read_csv(r'https://storage.googleapis.com/assignment-data/Point_in_Time_Estimates_of_Homelessness_in_the_US_by_State.csv')
@@ -65,58 +51,61 @@ population_table['state'] = population_table['state'].map(state_codes)
 
 
 
+
+
 pivoted_data = data.pivot_table(values='count', index = ['year' , 'state' ],   columns= 'homeless_type',    aggfunc= ['sum'],   margins = False)
 pivoted_data.columns = pivoted_data.columns.to_series().str.join('')
 pivoted_data.columns = pivoted_data.columns.str.replace("sum", "")
+
 pivoted_data.reset_index(inplace = True)
 
 states_dictionary = pd.read_csv(r'https://raw.githubusercontent.com/cphalpert/census-regions/master/us%20census%20bureau%20regions%20and%20divisions.csv')
+
+
 pivoted_data = pd.merge(pivoted_data , states_dictionary, left_on = 'state' ,right_on = 'State Code' , how = 'left')
+pivoted_data  = pd.merge(pivoted_data , population_table , left_on = ['year' , 'state'] , right_on = ['year' , 'state'] , how = 'left')
+
+
+
+pivoted_data['Homelessness Rate' ] = pivoted_data['Overall Homeless' ]/ pivoted_data['population' ]
+pivoted_data['Homelessness Rate ' ] = pivoted_data['Homelessness Rate' ].apply(lambda x : '{:.2%}'.format(x))
+
+
 
 selected_year = 2018
 pivoted_data_sliced = pivoted_data[pivoted_data['year'].isin([selected_year])].reset_index()
 
-pivoted_data_sliced  = pd.merge(pivoted_data_sliced , population_table , left_on = ['year' , 'state'] , right_on = ['year' , 'state'] , how = 'left')
 
 
 
-pivoted_data_sliced['Homelessness Rate' ] = pivoted_data_sliced['Overall Homeless' ]/ pivoted_data_sliced['population' ]
-pivoted_data_sliced['Homelessness Rate - hover' ]  = pivoted_data_sliced['Homelessness Rate' ].apply(lambda x : '{:.2%}'.format(x))
-
-
-
-pivoted_data_sliced['Homelessness Percent by region'] = pivoted_data_sliced['Overall Homeless']/pivoted_data_sliced['Overall Homeless'].sum()
-
-#######
+### Fig1 - Tab: State-wise Analysis - Summary table 
 
 yoy_homeless = pd.merge(pivoted_data_sliced.groupby('Region').sum('Overall Homeless')['Overall Homeless'], 
                         pivoted_data[pivoted_data['year'].isin([selected_year-1])][['Region' , 'Overall Homeless']].groupby('Region').sum('Overall Homeless')['Overall Homeless'], 
                         how = 'left',
                         on = 'Region').rename(columns = {'Overall Homeless_y':'Prior Year Overall Homeless',
-                                                        'Overall Homeless_x':'Selected Year Overall Homeless'})
-                        
-yoy_homeless['Homelessness Percent by region'] = yoy_homeless['Selected Year Overall Homeless']/yoy_homeless['Selected Year Overall Homeless'].sum()         
-yoy_homeless['Homelessness Percent by region']=yoy_homeless['Homelessness Percent by region'].apply(lambda x : '{:.2%}'.format(x))
+                                                        'Overall Homeless_x':'Overall Homeless during {x}'.format(x=selected_year)})
 
-yoy_homeless = yoy_homeless.sort_values(by = 'Selected Year Overall Homeless' , ascending = False)
-yoy_homeless[['Selected Year Overall Homeless' ,'Prior Year Overall Homeless']] = yoy_homeless[['Selected Year Overall Homeless' ,'Prior Year Overall Homeless']].apply(lambda x : x.astype(int))
 
-yoy_homeless['Percent change vs prior Year'] = (yoy_homeless['Selected Year Overall Homeless']/yoy_homeless['Prior Year Overall Homeless']) -1
+yoy_homeless['Overall Homeless Distribution'] = yoy_homeless['Overall Homeless during {x}'.format(x=selected_year)]/yoy_homeless['Overall Homeless during {x}'.format(x=selected_year)].sum()  
+yoy_homeless[['Overall Homeless during {x}'.format(x=selected_year) , 'Prior Year Overall Homeless']] = yoy_homeless[['Overall Homeless during {x}'.format(x=selected_year) , 'Prior Year Overall Homeless']].astype(int)
+
+yoy_homeless['Percent change vs prior Year'] = (yoy_homeless['Overall Homeless during {x}'.format(x=selected_year)]/yoy_homeless['Prior Year Overall Homeless']) -1
 
 yoy_homeless['Percent change vs prior Year']  = yoy_homeless['Percent change vs prior Year'].apply(lambda x : '{:.2%}'.format(x))
-yoy_homeless
+yoy_homeless['Overall Homeless Distribution']=yoy_homeless['Overall Homeless Distribution'].apply(lambda x : '{:.2%}'.format(x))
 
 
-yoy_homeless_summary = yoy_homeless[['Homelessness Percent by region' , 'Selected Year Overall Homeless'  , 'Percent change vs prior Year']]
-
-yoy_homeless_summary
+yoy_homeless = yoy_homeless[['Overall Homeless Distribution' , 'Overall Homeless during {x}'.format(x=selected_year) , 'Percent change vs prior Year']].sort_values(by = 'Overall Homeless during {x}'.format(x=selected_year) ,  ascending = False)
 
 
-#########
-### State Analysis 
 
-fig_1_state = px.bar(pivoted_data_sliced.sort_values(by = 'Homelessness Rate' )[1:10], x="Homelessness Rate", y="state"
-             , title  = 'Top 10 States with Highest Overall Homelessness' , hover_data=['Homelessness Rate - hover'],)
+
+
+### Fig2 - Tab: State-wise Analysis - Top 10 states with highest Homelessness Rate
+
+fig_1_state = px.bar(pivoted_data_sliced.sort_values(by = 'Homelessness Rate' , ascending = True )[0:10], x="Homelessness Rate", y="state" , orientation = 'h'
+             , title  = 'Top 10 States with Highest Homelessness Rate' , custom_data =['Homelessness Rate ' , 'Homelessness Rate' ],)
 
 
 fig_1_state.update_layout({
@@ -125,34 +114,79 @@ fig_1_state.update_layout({
 } , width = 450 , height  = 450)
 
 
+fig_1_state.update_traces(
+    hovertemplate="<br>".join([
+        "State: %{x}",
+        "Homelessness Rate: %{customdata[0]}"
+    ])
+)
 
 
 
+### Fig3 - Tab: State-wise Analysis - Top 10 states with highest Overall homeless
+fig_3_state = px.bar(pivoted_data_sliced.sort_values(by = 'Overall Homeless' , ascending = True )[0:10], x="Overall Homeless", y="state" , orientation = 'h'
+             , title  = 'Top 10 States with Highest Overall Homelessness'  ,  custom_data =['Overall Homeless' , 'Homelessness Rate' ],)
+
+
+fig_3_state.update_layout({
+'plot_bgcolor': 'rgba(0, 0, 0, 0)',
+'paper_bgcolor':'rgba(0, 0, 0, 0)',
+} , width = 450 , height  = 450
+ ,colorway =['green'])
+
+
+fig_3_state.update_traces(marker_color='orange',
+    hovertemplate="<br>".join([
+        "State: %{x}",
+        "Overall Homeless: %{customdata[0]}"
+    ])
+)
+
+
+
+
+### Fig4 - Tab: State-wise Analysis - Map - distribution of Homelessness Rate
 
 fig_2_state = go.Figure(data=go.Choropleth(
     locations=pivoted_data_sliced['state'], 
     z = pivoted_data_sliced['Homelessness Rate'], 
     locationmode = 'USA-states',
 #    colorscale = 'Reds'
-    hovertemplate = 'Overall Homeless: %{Overall Homeless}'
+ 
 
-    ,text=pivoted_data_sliced['Homelessness Rate - hover'], 
-    marker_line_color='white' 
+    text=pivoted_data_sliced['Homelessness Rate '], 
+    marker_line_color='white' , customdata =['Homelessness Rate ' , 'Homelessness Rate' ]
 ))
 
 fig_2_state.update_layout(
     title_text = 'The State-wise distribution of the Homelessness Rate',
-    geo_scope='usa'  , width = 700 , height  = 450
+    geo_scope='usa'  , width = 800 , height  = 450
 )
+
+fig_2_state.update_traces(
+    hovertemplate="<br>".join([
+        "Overall Homeless: %{locations}",
+        "ColY: %{y}",
+        "Col1: %{customdata[0]}",
+        "Col2: %{customdata[1]}",
+        "Col3: %{customdata[2]}",
+    ])
+)
+
+
 
 
 
 
 yoy_analysis = dbc.Container(dcc.Graph(figure={"data": [{"x": [1, 2, 3], "y": [1, 4, 9]}]}))
 state_level_analysis = dbc.Container([
-            dbc.Row([  dbc.Col([ dcc.Graph(id="fig_2_state",figure =fig_2_state ,  style={'display': 'inline-block'}) ,  ]) ,      dbc.Col([ dcc.Graph(id="fig_1_state",figure =fig_1_state ,  style={'display': 'inline-block'}),  ])     ]),
-            dbc.Row([  dbc.Col([ html.H3("Contributions to prediction:"),  ]), ]),
-            dbc.Row([  dbc.Col([ html.H3("Every tree in the Random Forest:"), ]), ])
+            
+            #dbc.Row([  dbc.Col([ dbc.Table.from_dataframe(   yoy_homeless, striped=False, bordered=True, hover=True, index=True , size = 'sm'), ]  ) ,    ]),
+            dbc.Row([  dbc.Col([ dcc.Graph(id="fig_3_state",figure =fig_3_state ,  style={'display': 'inline-block'}) ,  ]) ,    dbc.Col([ dcc.Graph(id="fig_2_state",figure =fig_2_state ,  style={'display': 'inline-block'}) ,  ]) ,         ]),
+            dbc.Row([  dbc.Col([ dcc.Graph(id="fig_1_state",figure =fig_1_state ,  style={'display': 'inline-block'}) ,  ]) , dbc.Col([ dbc.Table.from_dataframe(   yoy_homeless, striped=False, bordered=True, hover=True, index=True , size = 'lg'), ]  ) ,        ]),
+
+            #dbc.Row([  dbc.Col([ html.H3("Every tree in the Random Forest:"), ]), ])
+        #    dbc.Row([  dbc.Col([ dbc.Table.from_dataframe(   yoy_homeless, striped=False, bordered=True, hover=True, index=True , size = 'lg'), ]  ) ,    ]),
         ])
 
 
