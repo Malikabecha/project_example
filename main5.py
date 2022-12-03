@@ -183,7 +183,7 @@ state_level_analysis = dbc.Container([
             
             #dbc.Row([  dbc.Col([ dbc.Table.from_dataframe(   yoy_homeless, striped=False, bordered=True, hover=True, index=True , size = 'sm'), ]  ) ,    ]),
             dbc.Row([  dbc.Col([ dcc.Graph(id="fig_3_state",figure =fig_3_state ,  style={'display': 'inline-block'}) ,  ]) ,    dbc.Col([ dcc.Graph(id="fig_2_state",figure =fig_2_state ,  style={'display': 'inline-block'}) ,  ]) ,         ]),
-            dbc.Row([  dbc.Col([ dcc.Graph(id="fig_1_state",figure =fig_1_state ,  style={'display': 'inline-block'}) ,  ]) , dbc.Col([ dbc.Table.from_dataframe(   yoy_homeless, striped=False, bordered=True, hover=True, index=True , size = 'lg'), ]  ) ,        ]),
+            dbc.Row([  dbc.Col([ dcc.Graph(id="fig_1_state",figure =fig_1_state ,  style={'display': 'inline-block'}) ,  ]) , dbc.Col([  html.Br() , dbc.Table.from_dataframe(   yoy_homeless, striped=False, bordered=True, hover=True, index=True , size = 'lg'), ]  ) ,        ]),
 
             #dbc.Row([  dbc.Col([ html.H3("Every tree in the Random Forest:"), ]), ])
         #    dbc.Row([  dbc.Col([ dbc.Table.from_dataframe(   yoy_homeless, striped=False, bordered=True, hover=True, index=True , size = 'lg'), ]  ) ,    ]),
