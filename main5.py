@@ -67,28 +67,35 @@ pivoted_data['Homelessness Rate'] = pivoted_data['Overall Homeless'] / pivoted_d
 pivoted_data['Homelessness Rate '] = pivoted_data['Homelessness Rate'].apply(lambda x: '{:.2%}'.format(x))
 
 
-def state_level_summary (selected_year=2018):
+def state_level_summary(selected_year=2018):
     pivoted_data_sliced = pivoted_data[pivoted_data['year'].isin([selected_year])].reset_index()
-    yoy_homeless = pd.merge(pivoted_data_sliced.groupby('Region').sum('Overall Homeless')['Overall Homeless'], 
-                        pivoted_data[pivoted_data['year'].isin([selected_year-1])][['Region' , 'Overall Homeless']].groupby('Region').sum('Overall Homeless')['Overall Homeless'], 
-                        how = 'left',
-                        on = 'Region').rename(columns = {'Overall Homeless_y':'Prior Year Overall Homeless',
-                                                        'Overall Homeless_x':'Overall Homeless during {x}'.format(x=selected_year)})
+    yoy_homeless = pd.merge(pivoted_data_sliced.groupby('Region').sum('Overall Homeless')['Overall Homeless'],
+                            pivoted_data[pivoted_data['year'].isin([selected_year-1])][['Region', 'Overall Homeless']
+                                                                                       ].groupby('Region').sum('Overall Homeless')['Overall Homeless'],
+                            how='left',
+                            on='Region').rename(columns={'Overall Homeless_y': 'Prior Year Overall Homeless',
+                                                         'Overall Homeless_x': 'Overall Homeless during {x}'.format(x=selected_year)})
 
-    yoy_homeless['Overall Homeless L4Y'] = pivoted_data[pivoted_data['year'].isin([selected_year-1, selected_year-2, selected_year-3,selected_year-4])][['Region' , 'Overall Homeless']].groupby('Region').sum('Overall Homeless')['Overall Homeless']/4
-    yoy_homeless['Percent change vs Baseline']  = (yoy_homeless['Overall Homeless during {x}'.format(x=selected_year)] /yoy_homeless['Overall Homeless L4Y'])-1
-    yoy_homeless['Overall Homeless Distribution'] = yoy_homeless['Overall Homeless during {x}'.format(x=selected_year)]/yoy_homeless['Overall Homeless during {x}'.format(x=selected_year)].sum()  
-    yoy_homeless[['Overall Homeless during {x}'.format(x=selected_year) , 'Prior Year Overall Homeless']] = yoy_homeless[['Overall Homeless during {x}'.format(x=selected_year) , 'Prior Year Overall Homeless']].astype(int)
+    yoy_homeless['Overall Homeless L4Y'] = pivoted_data[pivoted_data['year'].isin([selected_year-1, selected_year-2, selected_year-3, selected_year-4])][[
+        'Region', 'Overall Homeless']].groupby('Region').sum('Overall Homeless')['Overall Homeless']/4
+    yoy_homeless['Percent change vs Baseline'] = (
+        yoy_homeless['Overall Homeless during {x}'.format(x=selected_year)] / yoy_homeless['Overall Homeless L4Y'])-1
+    yoy_homeless['Overall Homeless Distribution'] = yoy_homeless['Overall Homeless during {x}'.format(
+        x=selected_year)]/yoy_homeless['Overall Homeless during {x}'.format(x=selected_year)].sum()
+    yoy_homeless[['Overall Homeless during {x}'.format(x=selected_year), 'Prior Year Overall Homeless']] = yoy_homeless[[
+        'Overall Homeless during {x}'.format(x=selected_year), 'Prior Year Overall Homeless']].astype(int)
 
-    yoy_homeless['Percent change vs prior Year'] = (yoy_homeless['Overall Homeless during {x}'.format(x=selected_year)]/yoy_homeless['Prior Year Overall Homeless']) -1
+    yoy_homeless['Percent change vs prior Year'] = (yoy_homeless['Overall Homeless during {x}'.format(
+        x=selected_year)]/yoy_homeless['Prior Year Overall Homeless']) - 1
 
-    yoy_homeless['Percent change vs prior Year']  = yoy_homeless['Percent change vs prior Year'].apply(lambda x : '{:.2%}'.format(x))
-    yoy_homeless['Overall Homeless Distribution']=yoy_homeless['Overall Homeless Distribution'].apply(lambda x : '{:.2%}'.format(x))
-    yoy_homeless['Percent change vs Baseline'] = yoy_homeless['Percent change vs Baseline'].apply(lambda x : '{:.2%}'.format(x))
+    yoy_homeless['Percent change vs prior Year'] = yoy_homeless['Percent change vs prior Year'].apply(lambda x: '{:.2%}'.format(x))
+    yoy_homeless['Overall Homeless Distribution'] = yoy_homeless['Overall Homeless Distribution'].apply(lambda x: '{:.2%}'.format(x))
+    yoy_homeless['Percent change vs Baseline'] = yoy_homeless['Percent change vs Baseline'].apply(lambda x: '{:.2%}'.format(x))
 
-
-    yoy_homeless = yoy_homeless[['Overall Homeless Distribution' , 'Overall Homeless during {x}'.format(x=selected_year) , 'Percent change vs prior Year' , 'Percent change vs Baseline']].sort_values(by = 'Overall Homeless during {x}'.format(x=selected_year) ,  ascending = False)
-    yoy_homeless['Overall Homeless during {x}'.format(x=selected_year)] = yoy_homeless['Overall Homeless during {x}'.format(x=selected_year)].apply(lambda x:  f'{x:,}' )
+    yoy_homeless = yoy_homeless[['Overall Homeless Distribution', 'Overall Homeless during {x}'.format(
+        x=selected_year), 'Percent change vs prior Year', 'Percent change vs Baseline']].sort_values(by='Overall Homeless during {x}'.format(x=selected_year),  ascending=False)
+    yoy_homeless['Overall Homeless during {x}'.format(
+        x=selected_year)] = yoy_homeless['Overall Homeless during {x}'.format(x=selected_year)].apply(lambda x:  f'{x:,}')
     return yoy_homeless
 
 
@@ -113,36 +120,35 @@ def homeless_count_map(selected_year=2018, count_type='Overall Homeless'):
 
 
 avail_beds = pd.DataFrame()
-for i in range(2008,2019,1):
+for i in range(2008, 2019, 1):
     df.columns
-    df = pd.read_excel(r'https://www.huduser.gov/portal/sites/default/files/xls/2007-2021-HIC-Counts-by-State.xlsx' , sheet_name = str(i) , skiprows = [0] )
+    df = pd.read_excel(r'https://www.huduser.gov/portal/sites/default/files/xls/2007-2021-HIC-Counts-by-State.xlsx', sheet_name=str(i), skiprows=[0])
     if i == 2013:
         df['Total Year-Round Beds (ES, TH, SH)'] = df['Total Year-Round ES Beds'] + df['Total Year-Round TH Beds'] + df['Total Year-Round SH Beds']
-    
-    df.rename(columns = { 'Total Year-Round Beds (ES,TH,SH)':'Total Year-Round Beds (ES, TH, SH)'   ,'Total Year-Round ES Beds':'Total Year-Round Beds (ES)' , 'Total Year-Round TH Beds':'Total Year-Round Beds (TH)' , 'Total Year-Round SH Beds':'Total Year-Round Beds (SH)'  } , inplace = True)
+
+    df.rename(columns={'Total Year-Round Beds (ES,TH,SH)': 'Total Year-Round Beds (ES, TH, SH)', 'Total Year-Round ES Beds': 'Total Year-Round Beds (ES)',
+              'Total Year-Round TH Beds': 'Total Year-Round Beds (TH)', 'Total Year-Round SH Beds': 'Total Year-Round Beds (SH)'}, inplace=True)
     df = df[['State', 'Total Year-Round Beds (ES, TH, SH)']]
-    df['Year'] = i 
+    df['Year'] = i
     avail_beds = avail_beds.append(df)
 
-data = pd.merge(data,avail_beds , right_on =  ['Year' , 'State']  , left_on = ['year' , 'state'] , how ='left')#.rename(columns= )
+data = pd.merge(data, avail_beds, right_on=['Year', 'State'], left_on=['year', 'state'], how='left')  # .rename(columns= )
 
 
-def beds_availability(selected_state = 'AR'):
-    data_plot = data[(data['year'] >= 2009) & data['homeless_type'].isin(['Sheltered Total Homeless'  , 'Unsheltered Homeless']) ].rename(columns= {'homeless_type' : 'Homeless Type'} )
-    fig = px.bar(data_plot[data_plot['state'].isin([selected_state])], x = 'year', y = 'count', color = 
-        'Homeless Type', barmode = 'stack')
-    fig.update_layout(title = "Shelter Status and Beds Availability in AR",
-          yaxis_title = 'Number of Homeless', 
-         width = 1200, height =600)
+def beds_availability(selected_state='AR'):
+    data_plot = data[(data['year'] >= 2009) & data['homeless_type'].isin(
+        ['Sheltered Total Homeless', 'Unsheltered Homeless'])].rename(columns={'homeless_type': 'Homeless Type'})
+    fig = px.bar(data_plot[data_plot['state'].isin([selected_state])], x='year', y='count', color='Homeless Type', barmode='stack')
+    fig.update_layout(title="Shelter Status and Beds Availability in AR",
+                      yaxis_title='Number of Homeless',
+                      width=1200, height=600)
 
-
-    fig.add_scatter(x=data_plot[data_plot['state'].isin([selected_state])]['year']
-                    , y=data_plot[data_plot['state'].isin([selected_state])]['Total Year-Round Beds (ES, TH, SH)']
-                    , mode = 'lines',name = "Available Beds")
+    fig.add_scatter(x=data_plot[data_plot['state'].isin([selected_state])]['year'], y=data_plot[data_plot['state'].isin(
+        [selected_state])]['Total Year-Round Beds (ES, TH, SH)'], mode='lines', name="Available Beds")
     fig.update_layout({
         'plot_bgcolor': 'rgba(0, 0, 0, 0)',
-        'paper_bgcolor':'rgba(0, 0, 0, 0)',
-        },  width = 1200, height =600 , showlegend=True)
+        'paper_bgcolor': 'rgba(0, 0, 0, 0)',
+    },  width=1200, height=600, showlegend=True)
     return fig
 
 
@@ -153,7 +159,7 @@ def top_10_highest_homeless_count(selected_year=2018,  count_type='Overall Homel
     fig_3_state.update_layout({
         'plot_bgcolor': 'rgba(0, 0, 0, 0)',
         'paper_bgcolor': 'rgba(0, 0, 0, 0)',
-    }, width=450, height=450, colorway=['green'], yaxis={'categoryorder':'total ascending'})
+    }, width=450, height=450, colorway=['green'], yaxis={'categoryorder': 'total ascending'})
 
     fig_3_state.update_traces(marker_color='orange',
                               #   hovertemplate="<br>".join([
@@ -438,10 +444,11 @@ def yoy_fig8():
 
 
 def yoy_fig9():
-    pivoted_data_state_year_level = data.pivot_table(values='count', index = ['year' , 'state'], columns= 'homeless_type',  aggfunc= ['sum'], margins = False)
+    pivoted_data_state_year_level = data.pivot_table(
+        values='count', index=['year', 'state'], columns='homeless_type',  aggfunc=['sum'], margins=False)
     pivoted_data_state_year_level.columns = pivoted_data_state_year_level.columns.to_series().str.join('')
     pivoted_data_state_year_level.columns = pivoted_data_state_year_level.columns.str.replace("sum", "")
-    pivoted_data_state_year_level.reset_index(inplace = True)
+    pivoted_data_state_year_level.reset_index(inplace=True)
     fig = px.box(pivoted_data_state_year_level, x="year", y="Overall Homeless", title="Boxplot - Yearly Distribution of Homeless")
     return fig
 
@@ -465,25 +472,63 @@ drop_down_state_container_variable = dcc.Dropdown(id="variable", options=[
 
 ################ Subpopulations Tab ##########################
 Homeless_Subpopulation = dbc.Container([
-
     dbc.Row([html.H2('Overall Homelessness during 2018', style={'text-align': 'center', 'margin-top': '20px'})]),
-
+    # fig 1
+    dbc.Row([dbc.Col(), dbc.Col([html.P('In this figure, we would like to analyze the data collected on homeless types in 2018 in the United States. From the data it can be assumed that Chronically homeless people constitute less proportion of overall homeless population.')]), dbc.Col()]),
     dbc.Row([dbc.Col(), dbc.Col([dcc.Graph(figure=Chronically_Homeless_Prop_Pie(2018),  style={'display': 'inline-block'}),]), dbc.Col()]),
+    dbc.Row([dbc.Col(), dbc.Col([html.P('It can be seen that 17.6% of the homeless population is chronically homeless in 2018 where the other 82.4% of the homelessness belongs to all other homeless population categories. So, this proportion of chronically homeless population out of entire homeless population is not insignificant.')]), dbc.Col()]),
 
-    dbc.Row([dbc.Col([dcc.Graph(figure=Homeless_by_shelter(2018),  style={'display': 'inline-block'}),]),
-             dbc.Col([dcc.Graph(figure=sheltered_by_shelter_type(2018),  style={'display': 'inline-block'}),])
-             ]),
+    dbc.Row(style={'margin': '50px', 'border': '1px solid gray'}),
+    # fig 2
+    dbc.Row([
+        dbc.Col([html.P('In the first figure we would like to analyze total homeless population to find out whether USA has more sheltered homeless population than unsheltered')]),
+        dbc.Col([html.P('In the second figure we would like to analyze the population of sheltered homeless population to see which type of shelter is provided more in the USA. It is assumed that  out of ES, SH and TH shelter type sheltered homeless population were allocated more in the ES shelter.')]),
+    ]),
+    dbc.Row([
+        dbc.Col([dcc.Graph(figure=Homeless_by_shelter(2018),  style={'display': 'inline-block'}),]),
+        dbc.Col([dcc.Graph(figure=sheltered_by_shelter_type(2018),  style={'display': 'inline-block'}),])
+    ]),
+    dbc.Row([
+        dbc.Col([html.P('From the first chart it is clearly visible that USA has significantly more sheltered homeless than unsheltered and the size is almost double. So, it can be told that USA is actively trying to allocate their homeless population in shelter homes.')]),
+        dbc.Col([html.P('From the second figure we can see out of sheltered homeless population, the major share of homeless population were given shelter to ES shelters and the proportion is 76.9% and the least chosen shelter type to allocate homeless population was SH shelters, whose proportion is only .543% that is  almost 142 times less than the former percentage. It is also visible that TH shelter types also got a significant amount of homeless population and the percentage is 22.5%')]),
+    ]),
 
+    dbc.Row(style={'margin': '50px', 'border': '1px solid gray'}),
+    # fig 3
+    dbc.Row([
+        dbc.Col([html.P('In the first figure we would try to analyze the population of homeless households to see which population of homeless is more. It can be assumed that there less households with homeless people in families than  households with individually homeless population.')]),
+        dbc.Col([html.P('In the second figure we will try to analyze shelter types provided to  households with homeless people in families and to households with individual homeless people. It is assumed ES shelter were given more than TH and SH shelters.')]),
+    ]),
     dbc.Row([dbc.Col([dcc.Graph(figure=Overall_Homeless_subpop_bar(selected_year=2018),  style={'display': 'inline-block'}),]),
              dbc.Col([dcc.Graph(figure=Homeless_Type_by_Shelter(2018),  style={'display': 'inline-block'}),])]),
+    dbc.Row([
+        dbc.Col([html.P('From the first figure it is visible that almost 355,000 of  households has homeless individuals and almost 155,000 of households has homeless people in families which is half of the size of households with homeless individuals.')]),
+        dbc.Col([html.P('From the second figure we can see out of total homeless individuals around 145,000 were sheltered in ES shelters and around 45,000 were sheltered in TH shelters and approximately 5,000 were sheltered in SH shelters.Out of total population of homeless in families almost 125,000 were sheltered in ES shelters and almost 35,000 were sheltered in TH shelters and none of them were sheltered in SH shelters. So, SH shelters are not much popular shelter types for allocating homeless households.')]),
+    ]),
+
+    dbc.Row(style={'margin': '50px', 'border': '1px solid gray'}),
+    # fig 4
 
     dbc.Row([html.H2('Youth Homelessness during 2018', style={'text-align': 'center', 'margin-top': '20px'})]),
-
+    dbc.Row([dbc.Col(), dbc.Col([html.P('In this figure, we would like to analyze the data collected on homeless types in 2018 in the United States. From the data it can be assumed that Chronically homeless people constitute less proportion of overall homeless population.')]), dbc.Col()]),
     dbc.Row([dbc.Col(), dbc.Col([dcc.Graph(figure=Youth_Homeless_Prop_Pie(2018),  style={'display': 'inline-block'}),]), dbc.Col()]),
+    dbc.Row([dbc.Col(), dbc.Col([html.P('From this figure it can be seen only 7.17% of chronically homeless population is aged under 25 and remaining 91.8% are most likely aged more than 25. So, it can be said young population are less likely to be chronically homeless.')]), dbc.Col()]),
+    dbc.Row([dbc.Col(), dbc.Col([html.P('From the chronically homeless youths population it also can be seen that the larger percentage of them are unaccompanied and the percentage is 6.59% and 1.58% is young homeless who are parenting.')]), dbc.Col()]),
 
-
+    dbc.Row(style={'margin': '50px', 'border': '1px solid gray'}),
+    # fig 4
+    dbc.Row([
+        dbc.Col([html.P('From this figure we will try to analyze out of young homeless population, which age group has more homelessness. It can be assumed that those who are under 18 are less likely to be more homeless.')]),
+        dbc.Col([html.P('And then we will try to analyze from the other figure  we will try to analyze out of young homeless is there more sheltered than unsheltered. It can be assumed that there are more sheltered young homeless population than unsheltered.')]),
+    ]),
     dbc.Row([dbc.Col([dcc.Graph(figure=homeless_youth(selected_year=2018),  style={'display': 'inline-block'}),]),
              dbc.Col([dcc.Graph(figure=homeless_youth_by_age(2018),  style={'display': 'inline-block'}),])]),
+    dbc.Row([
+        dbc.Col([html.P('From these two figures it is visible out of young population the larger share that is 90.7% are homeless who are above 18 but under 25 age group and only 9.27% is aged under 18  which is 10 times less than homeless population of age group (18-24).')]),
+        dbc.Col([html.P('Then we also can see out of young homeless population 58.2% of homeless are sheltered and 41.8% are not sheltered yet. SO the margin between sheltered and unsheltered young homeless population is not large enough and authorities should work more on providing shelters to young homeless population.')]),
+    ]),
+
+    dbc.Row(style={'margin': '50px', 'border': '1px solid gray'}),
 
 ], fluid=True, style={"height": "100vh"})
 
@@ -563,7 +608,7 @@ state_level_analysis = dbc.Container([
     dbc.Row([html.Br()]),
     dbc.Row([dbc.Col([dcc.Graph(id="fig_3_state",  style={'display': 'inline-block'}),]),
             dbc.Col([dcc.Graph(id="fig_2_state",  style={'display': 'inline-block'}),]),]),
-    dbc.Row([ dbc.Col([dcc.Graph(figure = beds_availability(selected_state = 'AR'),  style={'display': 'inline-block'}),]) ]),
+    dbc.Row([dbc.Col([dcc.Graph(figure=beds_availability(selected_state='AR'),  style={'display': 'inline-block'}),])]),
 
 ])
 
