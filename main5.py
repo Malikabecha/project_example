@@ -135,7 +135,7 @@ def top_10_highest_homeless_count(selected_year=2018,  count_type='Overall Homel
     fig_3_state.update_layout({
         'plot_bgcolor': 'rgba(0, 0, 0, 0)',
         'paper_bgcolor': 'rgba(0, 0, 0, 0)',
-    }, width=450, height=450, colorway=['green'])
+    }, width=450, height=450, colorway=['green'], yaxis={'categoryorder':'total ascending'})
 
     fig_3_state.update_traces(marker_color='orange',
                               #   hovertemplate="<br>".join([
