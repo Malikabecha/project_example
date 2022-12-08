@@ -129,7 +129,7 @@ def homeless_count_map(selected_year=2018, count_type='Overall Homeless'):
 
 
 def top_10_highest_homeless_count(selected_year=2018,  count_type='Overall Homeless'):
-    fig_3_state = px.bar(pivoted_data[pivoted_data['year'] == selected_year].sort_values(by=count_type, ascending=True)[
+    fig_3_state = px.bar(pivoted_data[pivoted_data['year'] == selected_year].sort_values(by=count_type, ascending=False)[
                          0:10], x=count_type, y="state", orientation='h', title='Top 10 States with Highest Overall Homelessness')  # ,  custom_data =[count_type],)
 
     fig_3_state.update_layout({
