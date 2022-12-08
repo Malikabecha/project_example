@@ -655,6 +655,6 @@ def update_graphs_state(year, variable):
 
     return homeless_count_map(selected_year=year, count_type=variable), top_10_highest_homeless_count(selected_year=year, count_type=variable),  dbc.Table.from_dataframe(yoy_homeless, striped=False, bordered=True, hover=True, index=True, size='sm')
 
+if __name__ == '__main__':
+    app.run_server(debug=True, port=8080)
 
-if __name__ == "__main__":
-    app.run_server()
