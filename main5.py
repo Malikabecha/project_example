@@ -381,7 +381,7 @@ state_level_analysis = dbc.Container([
             dbc.Row([   html.Br() ]), 
             dbc.Row([    dbc.Col(), dbc.Col() , dbc.Col( drop_down_state_container ) ]),
             dbc.Row([ html.H2('Homelessness by US Regions' ) ]),
-            dbc.Row([   dbc.Col([html.Div(id = 'yoy_summary'  , style = {'display': 'inline-block'}     )])   ]),
+            dbc.Row([   dbc.Col([html.Div(id = 'yoy_summary'  )])   ]),
             dbc.Row([ html.H2('Homelessness by US States' ) ]),
             dbc.Row([    dbc.Col(), dbc.Col() , dbc.Col( drop_down_state_container_variable ) ]),
             dbc.Row([   html.Br() ]),
@@ -404,8 +404,6 @@ app.layout = html.Div([dbc.Tabs(
 
 @app.callback(
    [
-
-   #  Output(component_id = 'fig_1_state' , component_property = 'figure'),
      Output(component_id = 'fig_2_state' , component_property = 'figure'),
      Output(component_id = 'fig_3_state' , component_property = 'figure'),
      Output(component_id = 'yoy_summary' , component_property = 'children')
