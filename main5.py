@@ -45,20 +45,6 @@ state_codes = {
 state_codes = {v: k for k, v in state_codes.items()}
 population_table['state'] = population_table['state'].map(state_codes)
 
-# Median Rent
-median_contract_rent = pd.DataFrame()
-for i in range(2009, 2019):
-    c = Census("52b7c26667eed84927ca68b61e8cd4b3ff00f5f0", year=i)
-
-    df = pd.DataFrame(c.acs5.state('B25058_001E', Census.ALL))
-    df['year'] = i
-    median_contract_rent = median_contract_rent.append(df)
-
-median_contract_rent.rename(columns={'B25058_001E': 'median_contract_rent'}, inplace=True)
-
-median_contract_rent[median_contract_rent['year'] == 2015]
-median_contract_rent['state'] = median_contract_rent['state'].map(state_codes)
-
 
 ##############################################
 
@@ -124,6 +110,36 @@ def homeless_count_map(selected_year=2018, count_type='Overall Homeless'):
     )
 
     return fig_2_state
+
+
+avail_beds = pd.DataFrame()
+for i in range(2008,2019,1):
+    df = pd.read_excel('C:/Users/asus/Downloads/2007-2021-HIC-Counts-by-State.xlsx' , sheet_name = str(i) , skiprows = [0] )
+    df.rename(columns = {  'Total Year-Round ES Beds':'Total Year-Round Beds (ES)' , 'Total Year-Round TH Beds':'Total Year-Round Beds (TH)' , 'Total Year-Round SH Beds':'Total Year-Round Beds (SH)'  } , inplace = True)
+    df = df[['State', 'Total Year-Round Beds (ES, TH, SH)', 'Total Year-Round Beds (ES)', 'Total Year-Round Beds (TH)',     'Total Year-Round Beds (SH)']]
+    df['Year'] = i 
+    avail_beds = avail_beds.append(df)
+
+data = pd.merge(data,avail_beds , right_on =  ['Year' , 'State']  , left_on = ['year' , 'state'] , how ='left')#.rename(columns= )
+
+
+def beds_availability(selected_state = 'AR'):
+    data_plot = data[(data['year'] >= 2009) & data['homeless_type'].isin(['Sheltered Total Homeless'  , 'Unsheltered Homeless']) ].rename(columns= {'homeless_type' : 'Homeless Type'} )
+    fig = px.bar(data_plot[data_plot['state'].isin([selected_state])], x = 'year', y = 'count', color = 
+        'Homeless Type', barmode = 'stack')
+    fig.update_layout(title = "Shelter Status and Beds Availability",
+          yaxis_title = 'Number of Homeless', 
+         width = 1200, height =600)
+
+
+    fig.add_scatter(x=data_plot[data_plot['state'].isin([selected_state])]['year']
+                    , y=data_plot[data_plot['state'].isin([selected_state])]['Total Year-Round Beds (ES, TH, SH)']
+                    , mode = 'lines',name = "Available Beds")
+    fig.update_layout({
+        'plot_bgcolor': 'rgba(0, 0, 0, 0)',
+        'paper_bgcolor':'rgba(0, 0, 0, 0)',
+        },  width = 1200, height =600 , showlegend=True)
+    return fig
 
 
 def top_10_highest_homeless_count(selected_year=2018,  count_type='Overall Homeless'):
@@ -528,11 +544,11 @@ state_level_analysis = dbc.Container([
     dbc.Row([html.Br()]),
     dbc.Row([dbc.Col([dcc.Graph(id="fig_3_state",  style={'display': 'inline-block'}),]),
             dbc.Col([dcc.Graph(id="fig_2_state",  style={'display': 'inline-block'}),]),]),
-
+    dbc.Row([ dbc.Col([dcc.Graph(figure = beds_availability(selected_state = 'AR'),  style={'display': 'inline-block'}),]) ]),
 
 ])
 
-dbc.Col([html.Div(id='yoy_summary'), ]),
+#dbc.Col([html.Div(id='yoy_summary'), ]),
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 app.layout = html.Div([dbc.Tabs(
