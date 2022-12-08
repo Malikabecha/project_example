@@ -437,6 +437,15 @@ def yoy_fig8():
     return fig
 
 
+def yoy_fig9():
+    pivoted_data_state_year_level = data.pivot_table(values='count', index = ['year' , 'state'], columns= 'homeless_type',  aggfunc= ['sum'], margins = False)
+    pivoted_data_state_year_level.columns = pivoted_data_state_year_level.columns.to_series().str.join('')
+    pivoted_data_state_year_level.columns = pivoted_data_state_year_level.columns.str.replace("sum", "")
+    pivoted_data_state_year_level.reset_index(inplace = True)
+    fig = px.box(pivoted_data_state_year_level, x="year", y="Overall Homeless", title="Boxplot - Yearly Distribution of Homeless")
+    return fig
+
+
 drop_down_state_container = dcc.Dropdown(id="selected_year_state_tab", options=[
     {'label': '2015', 'value': 2015},
     {'label': '2016', 'value': 2016},
@@ -530,6 +539,12 @@ yoy_analysis = dbc.Container([
     dbc.Row([dbc.Col(), dbc.Col([html.P('In this figure we analyzed how the percentage of different categories of homelessness differs among all the states in 2018.')]), dbc.Col()]),
     dbc.Row([dbc.Col(), dbc.Col([dcc.Graph(figure=yoy_fig8(),  style={'display': 'inline-block'}),]), dbc.Col()]),
     dbc.Row([dbc.Col(), dbc.Col([html.P('We can see that sheltered total homeless comprises the highest percentage 15.5% and sheltered ES homeless comprises 11.9% of the entire homeless counts. Around 7.8% are homeless people in families and 3.84% are chronically homeless individual.')]), dbc.Col()]),
+
+    dbc.Row(style={'margin': '50px', 'border': '1px solid gray'}),
+    # fig 9
+    dbc.Row([dbc.Col(), dbc.Col([html.P('The boxplot below reveals tha we have some outliers. Some of the states are having extreme homelessness values compared to others. Each year, we have about 4 outliers states, which according to the above table, appear to be always CA, FL, NY , TX ')]), dbc.Col()]),
+    dbc.Row([dbc.Col(), dbc.Col([dcc.Graph(figure=yoy_fig9(),  style={'display': 'inline-block'}),]), dbc.Col()]),
+    dbc.Row([dbc.Col(), dbc.Col([html.P('We cannot draw the conclusion that the aforementioned states have the highest homelesness rate because their extreme values might be driven by their high population. In order to get a better results, it is good to normalize the numbers and get the true rates (Homeless count divided by population) ')]), dbc.Col()]),
 
     dbc.Row(style={'margin': '50px', 'border': '1px solid gray'}),
 
