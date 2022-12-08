@@ -127,7 +127,7 @@ def beds_availability(selected_state = 'AR'):
     data_plot = data[(data['year'] >= 2009) & data['homeless_type'].isin(['Sheltered Total Homeless'  , 'Unsheltered Homeless']) ].rename(columns= {'homeless_type' : 'Homeless Type'} )
     fig = px.bar(data_plot[data_plot['state'].isin([selected_state])], x = 'year', y = 'count', color = 
         'Homeless Type', barmode = 'stack')
-    fig.update_layout(title = "Shelter Status and Beds Availability",
+    fig.update_layout(title = "Shelter Status and Beds Availability in AR",
           yaxis_title = 'Number of Homeless', 
          width = 1200, height =600)
 
