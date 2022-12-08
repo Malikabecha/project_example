@@ -81,30 +81,28 @@ pivoted_data['Homelessness Rate'] = pivoted_data['Overall Homeless'] / pivoted_d
 pivoted_data['Homelessness Rate '] = pivoted_data['Homelessness Rate'].apply(lambda x: '{:.2%}'.format(x))
 
 
-def state_level_summary(selected_year=2018):
+def state_level_summary (selected_year=2018):
     pivoted_data_sliced = pivoted_data[pivoted_data['year'].isin([selected_year])].reset_index()
-    yoy_homeless = pd.merge(pivoted_data_sliced.groupby('Region').sum('Overall Homeless')['Overall Homeless'],
-                            pivoted_data[pivoted_data['year'].isin([selected_year-1])][['Region', 'Overall Homeless']
-                                                                                       ].groupby('Region').sum('Overall Homeless')['Overall Homeless'],
-                            how='left',
-                            on='Region').rename(columns={'Overall Homeless_y': 'Prior Year Overall Homeless',
-                                                         'Overall Homeless_x': 'Overall Homeless during {x}'.format(x=selected_year)})
+    yoy_homeless = pd.merge(pivoted_data_sliced.groupby('Region').sum('Overall Homeless')['Overall Homeless'], 
+                        pivoted_data[pivoted_data['year'].isin([selected_year-1])][['Region' , 'Overall Homeless']].groupby('Region').sum('Overall Homeless')['Overall Homeless'], 
+                        how = 'left',
+                        on = 'Region').rename(columns = {'Overall Homeless_y':'Prior Year Overall Homeless',
+                                                        'Overall Homeless_x':'Overall Homeless during {x}'.format(x=selected_year)})
 
-    yoy_homeless['Overall Homeless Distribution'] = yoy_homeless['Overall Homeless during {x}'.format(
-        x=selected_year)]/yoy_homeless['Overall Homeless during {x}'.format(x=selected_year)].sum()
-    yoy_homeless[['Overall Homeless during {x}'.format(x=selected_year), 'Prior Year Overall Homeless']] = yoy_homeless[[
-        'Overall Homeless during {x}'.format(x=selected_year), 'Prior Year Overall Homeless']].astype(int)
+    yoy_homeless['Overall Homeless L4Y'] = pivoted_data[pivoted_data['year'].isin([selected_year-1, selected_year-2, selected_year-3,selected_year-4])][['Region' , 'Overall Homeless']].groupby('Region').sum('Overall Homeless')['Overall Homeless']/4
+    yoy_homeless['Percent change vs Baseline']  = (yoy_homeless['Overall Homeless during {x}'.format(x=selected_year)] /yoy_homeless['Overall Homeless L4Y'])-1
+    yoy_homeless['Overall Homeless Distribution'] = yoy_homeless['Overall Homeless during {x}'.format(x=selected_year)]/yoy_homeless['Overall Homeless during {x}'.format(x=selected_year)].sum()  
+    yoy_homeless[['Overall Homeless during {x}'.format(x=selected_year) , 'Prior Year Overall Homeless']] = yoy_homeless[['Overall Homeless during {x}'.format(x=selected_year) , 'Prior Year Overall Homeless']].astype(int)
 
-    yoy_homeless['Percent change vs prior Year'] = (yoy_homeless['Overall Homeless during {x}'.format(
-        x=selected_year)]/yoy_homeless['Prior Year Overall Homeless']) - 1
+    yoy_homeless['Percent change vs prior Year'] = (yoy_homeless['Overall Homeless during {x}'.format(x=selected_year)]/yoy_homeless['Prior Year Overall Homeless']) -1
 
-    yoy_homeless['Percent change vs prior Year'] = yoy_homeless['Percent change vs prior Year'].apply(lambda x: '{:.2%}'.format(x))
-    yoy_homeless['Overall Homeless Distribution'] = yoy_homeless['Overall Homeless Distribution'].apply(lambda x: '{:.2%}'.format(x))
+    yoy_homeless['Percent change vs prior Year']  = yoy_homeless['Percent change vs prior Year'].apply(lambda x : '{:.2%}'.format(x))
+    yoy_homeless['Overall Homeless Distribution']=yoy_homeless['Overall Homeless Distribution'].apply(lambda x : '{:.2%}'.format(x))
+    yoy_homeless['Percent change vs Baseline'] = yoy_homeless['Percent change vs Baseline'].apply(lambda x : '{:.2%}'.format(x))
 
-    yoy_homeless = yoy_homeless[['Overall Homeless Distribution', 'Overall Homeless during {x}'.format(
-        x=selected_year), 'Percent change vs prior Year']].sort_values(by='Overall Homeless during {x}'.format(x=selected_year),  ascending=False)
-    yoy_homeless['Overall Homeless during {x}'.format(
-        x=selected_year)] = yoy_homeless['Overall Homeless during {x}'.format(x=selected_year)].apply(lambda x:  f'{x:,}')
+
+    yoy_homeless = yoy_homeless[['Overall Homeless Distribution' , 'Overall Homeless during {x}'.format(x=selected_year) , 'Percent change vs prior Year' , 'Percent change vs Baseline']].sort_values(by = 'Overall Homeless during {x}'.format(x=selected_year) ,  ascending = False)
+    yoy_homeless['Overall Homeless during {x}'.format(x=selected_year)] = yoy_homeless['Overall Homeless during {x}'.format(x=selected_year)].apply(lambda x:  f'{x:,}' )
     return yoy_homeless
 
 
