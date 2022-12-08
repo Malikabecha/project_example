@@ -112,8 +112,6 @@ def homeless_count_map(selected_year=2018, count_type='Overall Homeless'):
     return fig_2_state
 
 
-
-
 avail_beds = pd.DataFrame()
 for i in range(2008,2019,1):
     df.columns
@@ -572,7 +570,6 @@ app.layout = html.Div([dbc.Tabs(
         Output(component_id='fig_3_state', component_property='figure'),
         Output(component_id='yoy_summary', component_property='children')
     ],
-
     [Input(component_id='selected_year_state_tab', component_property='value'),
      Input(component_id='variable', component_property='value')
      ],
