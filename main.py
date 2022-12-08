@@ -628,6 +628,7 @@ state_level_analysis = dbc.Container([
 
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+server = app.server
 
 app.layout = html.Div([dbc.Tabs(
     [
