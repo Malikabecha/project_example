@@ -31,4 +31,4 @@ Werkzeug==0.16.0
 census==0.8.19
 ipywidgets==8.0.2
 openpyxl==3.0.10
-defusedxml==0.4.1
+defusedxml==0.7.1
