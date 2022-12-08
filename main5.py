@@ -107,15 +107,14 @@ def homeless_count_map(selected_year=2018, count_type='Overall Homeless'):
         #    colorscale = 'Reds'
 
 
-        text=pivoted_data[pivoted_data['year'] == selected_year][count_type],
-        marker_line_color='white', customdata=['Overall Homelessness', 'Homelessness Rate ']
+        #text=pivoted_data[pivoted_data['year'] == selected_year][count_type],
+        marker_line_color='white'#, customdata=['Overall Homelessness', 'Homelessness Rate ']
     ))
 
     fig_2_state.update_layout(
         title_text='State-wise distribution of the Homelessness',
         geo_scope='usa', width=800, height=450
     )
-
     return fig_2_state
 
 
