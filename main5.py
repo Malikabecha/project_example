@@ -602,17 +602,33 @@ state_level_analysis = dbc.Container([
     dbc.Row([html.Br()]),
     dbc.Row([dbc.Col(), dbc.Col(), dbc.Col(drop_down_state_container)]),
     dbc.Row([html.H2('Homelessness by US Regions')]),
+    dbc.Row([html.P('The distribution of homeless people among the four US regions is shown in the table below, along with a comparison to the previous year and the four years preceding. Given its high population and cost of living, the west is predicted to have the highest rate of homelessness.')]),
     dbc.Row([dbc.Col([html.Div(id='yoy_summary')])]),
+    dbc.Row(html.P('The results show that the West has the highest percentage of homeless people (38%), followed by the Northeast (26.53%). These two areas host more than half (65%) of the homeless population.')),
+    
+    
     dbc.Row([html.H2('Homelessness by US States')]),
+    
+    
+    dbc.Row(html.P('A lot of reasons that are state-specific can contribute to homelessness, like poverty, unemployment, cost of living, cost of housing and mental health, domestic violence. and that explains why some states have more homelessness than others')),
     dbc.Row([dbc.Col(), dbc.Col(), dbc.Col(drop_down_state_container_variable)]),
     dbc.Row([html.Br()]),
     dbc.Row([dbc.Col([dcc.Graph(id="fig_3_state",  style={'display': 'inline-block'}),]),
             dbc.Col([dcc.Graph(id="fig_2_state",  style={'display': 'inline-block'}),]),]),
-    dbc.Row([dbc.Col([dcc.Graph(figure=beds_availability(selected_state='AR'),  style={'display': 'inline-block'}),])]),
+    dbc.Row(html.P('California has the highest number of homeless people. Its homeless crisis is associated with high housing costs as people not able to find affordable housing. ')),
+    
+    
+
+    dbc.Row([ dbc.Col([dcc.Graph(figure = beds_availability(selected_state = 'AR'),  style={'display': 'inline-block'}),]) ]),
+    dbc.Row([html.P('One of the major reasons why we continue to have unsheltered people, is that we don’t have znough ressources for them.' )]),
+
+    dbc.Row(html.P('The above chart illustrates the shelter situation of the homeless people and the beds availability in Arkansas and proves the above assumption. Over time, there have been many fewer beds available in the various shelter kinds (TH,ES,SH) than there have been homeless people.'))
+
 
 ])
 
-#dbc.Col([html.Div(id='yoy_summary'), ]),
+
+
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 app.layout = html.Div([dbc.Tabs(
