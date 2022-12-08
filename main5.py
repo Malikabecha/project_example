@@ -439,7 +439,7 @@ drop_down_state_container_variable = dcc.Dropdown(id="variable", options=[
 ################ Subpopulations Tab ##########################
 Homeless_Subpopulation = dbc.Container([
 
-    dbc.Row([html.H2('Overall Homelessness during 2018')]),
+    dbc.Row([html.H2('Overall Homelessness during 2018', style={'text-align': 'center', 'margin-top': '20px'})]),
 
     dbc.Row([dbc.Col(), dbc.Col([dcc.Graph(figure=Chronically_Homeless_Prop_Pie(2018),  style={'display': 'inline-block'}),]), dbc.Col()]),
 
@@ -450,7 +450,7 @@ Homeless_Subpopulation = dbc.Container([
     dbc.Row([dbc.Col([dcc.Graph(figure=Overall_Homeless_subpop_bar(selected_year=2018),  style={'display': 'inline-block'}),]),
              dbc.Col([dcc.Graph(figure=Homeless_Type_by_Shelter(2018),  style={'display': 'inline-block'}),])]),
 
-    dbc.Row([html.H2('Youth Homelessness during 2018')]),
+    dbc.Row([html.H2('Youth Homelessness during 2018', style={'text-align': 'center', 'margin-top': '20px'})]),
 
     dbc.Row([dbc.Col(), dbc.Col([dcc.Graph(figure=Youth_Homeless_Prop_Pie(2018),  style={'display': 'inline-block'}),]), dbc.Col()]),
 
@@ -465,7 +465,7 @@ Homeless_Subpopulation = dbc.Container([
 
 
 yoy_analysis = dbc.Container([
-    dbc.Row([html.H2('Overall Homelessness during 2018')]),
+    dbc.Row([html.H2('Some Analysis Over Year', style={'text-align': 'center', 'margin-top': '20px'})]),
     # fig 1
     dbc.Row([dbc.Col(), dbc.Col([html.P('We are interested to see how the total number of overall homeless changes over the years from 2007 to 2018')]), dbc.Col()]),
     dbc.Row([dbc.Col(), dbc.Col([dcc.Graph(figure=yoy_fig1(),  style={'display': 'inline-block'}),]), dbc.Col()]),
