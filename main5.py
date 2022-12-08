@@ -112,11 +112,17 @@ def homeless_count_map(selected_year=2018, count_type='Overall Homeless'):
     return fig_2_state
 
 
+
+
 avail_beds = pd.DataFrame()
 for i in range(2008,2019,1):
+    df.columns
     df = pd.read_excel(r'https://www.huduser.gov/portal/sites/default/files/xls/2007-2021-HIC-Counts-by-State.xlsx' , sheet_name = str(i) , skiprows = [0] )
-    df.rename(columns = {  'Total Year-Round ES Beds':'Total Year-Round Beds (ES)' , 'Total Year-Round TH Beds':'Total Year-Round Beds (TH)' , 'Total Year-Round SH Beds':'Total Year-Round Beds (SH)'  } , inplace = True)
-    df = df[['State', 'Total Year-Round Beds (ES, TH, SH)', 'Total Year-Round Beds (ES)', 'Total Year-Round Beds (TH)',     'Total Year-Round Beds (SH)']]
+    if i == 2013:
+        df['Total Year-Round Beds (ES, TH, SH)'] = df['Total Year-Round ES Beds'] + df['Total Year-Round TH Beds'] + df['Total Year-Round SH Beds']
+    
+    df.rename(columns = { 'Total Year-Round Beds (ES,TH,SH)':'Total Year-Round Beds (ES, TH, SH)'   ,'Total Year-Round ES Beds':'Total Year-Round Beds (ES)' , 'Total Year-Round TH Beds':'Total Year-Round Beds (TH)' , 'Total Year-Round SH Beds':'Total Year-Round Beds (SH)'  } , inplace = True)
+    df = df[['State', 'Total Year-Round Beds (ES, TH, SH)']]
     df['Year'] = i 
     avail_beds = avail_beds.append(df)
 
