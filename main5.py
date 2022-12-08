@@ -299,6 +299,126 @@ def yoy_fig1():
     return fig
 
 
+def yoy_fig2():
+    ca = data.loc[data.state.isin(["CA"])].groupby('year').sum()
+    ca.rename(columns={'count': 'CA'}, inplace=True)
+    mi = data.loc[data.state.isin(["MI"])].groupby('year').sum()
+    mi.rename(columns={'count': 'MI'}, inplace=True)
+    # print(mi)
+    ca_mi = pd.merge(ca, mi, on='year')
+    # print(ca_mi)
+    # plot2= data.loc[data.state.isin(["CA", "MI"])].groupby('year').sum()
+    # print(plot2)
+    f = px.bar(ca_mi, y=["CA", "MI"], title="Total no of overall homeless for states MI and CA")
+    f.update_layout(xaxis_title="Years", yaxis_title="Total no of overall homeless")
+    f.update_layout(xaxis=dict(tickmode='linear'))
+    return f
+
+
+def yoy_fig3():
+    df2 = data.loc[data['state'] == 'CA']
+    df3 = df2.loc[data['homeless_type'].isin(['Sheltered Total Homeless Individuals', 'Unsheltered Homeless'])]
+    df4 = df3.query('homeless_type == "Sheltered Total Homeless Individuals"')
+    df5 = df3.query('homeless_type == "Unsheltered Homeless"')
+    df4_overall_ca = df4[['year', 'count']].copy()
+    df5_unsheltered_ca = df5[['year', 'count']].copy()
+    df4_overall_ca.rename(columns={'count': 'Sheltered Total Homeless Individuals'}, inplace=True)
+    df5_unsheltered_ca.rename(columns={'count': 'unsheltered_homeless'}, inplace=True)
+    # df5_unsheltered_ca
+    merged = pd.merge(df4_overall_ca, df5_unsheltered_ca, on='year')
+    # print(merged)
+    fig = px.line(merged, x='year', y=['Sheltered Total Homeless Individuals', 'unsheltered_homeless'],
+                  title="Comparison of total number of Sheltered Total Homeless Individuals and Unsheltered Homeless through the years in CA state")
+    # fig = px.line(df4_overall_ca, title="Comparison of total number of overall homeless through the years")
+    fig.update_layout(xaxis=dict(tickmode='linear'))
+    return fig
+
+
+def yoy_fig4():
+    d = data[data.homeless_type == "Overall Homeless"]
+    d = d[d.state.isin(["CA", "MI", "NC", "NY", "PA"])].groupby('state')['count'].sum()
+    d = d.to_frame()
+    d.rename(columns={'count': 'Overall Homeless'}, inplace=True)
+
+    e = data[data.homeless_type == "Sheltered Total Homeless"]
+    e = e[e.state.isin(["CA", "MI", "NC", "NY", "PA"])].groupby('state')['count'].sum()
+    e = e.to_frame()
+    e.rename(columns={'count': 'Sheltered Total Homeless'}, inplace=True)
+
+    de = pd.merge(d, e, on='state')
+
+    f = px.bar(de, y=["Overall Homeless", "Sheltered Total Homeless"],
+               title="Comparison of Overall Homeless vs Sheltered Total Homeless in 5 states")
+    f.update_layout(xaxis_title="States", yaxis_title="Total no of overall homeless")
+    f.update_layout(xaxis=dict(tickmode='linear'))
+    return f
+
+
+def yoy_fig5():
+    d = data.query('year == 2018 & homeless_type == "Overall Homeless"')
+    d = d.sort_values(by=['count'], ascending=False)
+    fig = px.pie(d[:10], values='count', names='state', title='Top 10 States with Overall Homeless in 2018')
+    fig.update_layout(xaxis=dict(tickmode='linear'))
+    return fig
+
+
+def yoy_fig6():
+    d = data[data.homeless_type.isin([
+        #'Homeless Individuals',
+        'Homeless Family Households',
+        'Homeless Veterans',
+        'Chronically Homeless',
+        'Homeless Children of Parenting Youth',
+        'Homeless Unaccompanied Youth Under 18',
+    ])]
+
+    d = d.drop(columns=['state'])
+    d = d.groupby(['year', 'homeless_type']).sum()
+    d = d.reset_index()
+    # print(d)
+
+    fig = px.bar(d, x="year", y="count", color='homeless_type', title="Total Homeless count by year of all states")
+    fig.update_layout(xaxis=dict(tickmode='linear'))
+    return fig
+
+
+def yoy_fig7():
+    d = data[data.homeless_type == "Overall Homeless"].groupby(['year', 'state']).apply(lambda x: x)
+
+    # Create empty DataFrame with specific column names & types
+    _df = pd.DataFrame({'year': pd.Series(dtype='int'),
+                        'state': pd.Series(dtype='str'),
+                        'count': pd.Series(dtype='int')})
+
+    for i in range(2007, 2019):
+        h = d[d.year == i].sort_values(by=['count'], ascending=False).head(1)
+        state = h.iloc[0]['state']
+        count = h.iloc[0]['count']
+        # print(state, count)
+
+        _df = _df.append({
+            'year': i,
+            'state': state,
+            'count': count
+        }, ignore_index=True)
+
+    # print(_df)
+    _df.rename(columns={'count': 'total no of overall Homeless'}, inplace=True)
+
+    fig = px.bar(_df, x="year", y="total no of overall Homeless", text="state", title="Max number of homeless state by year")
+    fig.update_layout(xaxis=dict(tickmode='linear'))
+    return fig
+
+
+def yoy_fig8():
+    d = data[data.year == 2018]
+    d = d.groupby('homeless_type')['count'].sum().to_frame()
+    d = d.sort_values(by=['count'], ascending=False).reset_index()
+
+    fig = px.pie(d[2:18], values='count', names='homeless_type', title='Percentage of difference types of homeless categories in 2018')
+    return fig
+
+
 drop_down_state_container = dcc.Dropdown(id="selected_year_state_tab", options=[
     {'label': '2015', 'value': 2015},
     {'label': '2016', 'value': 2016},
@@ -346,10 +466,52 @@ Homeless_Subpopulation = dbc.Container([
 
 yoy_analysis = dbc.Container([
     dbc.Row([html.H2('Overall Homelessness during 2018')]),
-
+    # fig 1
     dbc.Row([dbc.Col(), dbc.Col([html.P('We are interested to see how the total number of overall homeless changes over the years from 2007 to 2018')]), dbc.Col()]),
     dbc.Row([dbc.Col(), dbc.Col([dcc.Graph(figure=yoy_fig1(),  style={'display': 'inline-block'}),]), dbc.Col()]),
     dbc.Row([dbc.Col(), dbc.Col([html.P('We can see from the above figure that the number of total overall homeless was the highest in 2007 which was around 650000. The number tends to gradually decrease over the next two years 2008 and 2009 followed by a small increase. There was a decreasing pattern that can be seen from 2013 to 2017. During 2018 the number tends to increase a little.')]), dbc.Col()]),
+
+    dbc.Row(style={'margin': '50px', 'border': '1px solid gray'}),
+    # fig 2
+    dbc.Row([dbc.Col(), dbc.Col([html.P('In this figure we would like to analyze how the total number of overall homeless differs between the states CA and MI. We assume that CA being larger in both area and population than MI, the number would be more in CA.')]), dbc.Col()]),
+    dbc.Row([dbc.Col(), dbc.Col([dcc.Graph(figure=yoy_fig2(),  style={'display': 'inline-block'}),]), dbc.Col()]),
+    dbc.Row([dbc.Col(), dbc.Col([html.P('From the above figure we can observe that the number of overall homeless in CA is four times more than the number in MI in 2007 and 2008. And in other years it is around 5 times. We can also see a decreasing trend on the number of overall homeless from 2008 to 2010 in both states. In 2010 the number increased by 0.2 million and decreased again till 2017.')]), dbc.Col()]),
+
+    dbc.Row(style={'margin': '50px', 'border': '1px solid gray'}),
+    # fig 3
+    dbc.Row([dbc.Col(), dbc.Col([html.P('In this figure we wanted to explore the correlation between the total number of Sheltered Total Homeless Individuals and Unsheltered Homeless through the years in CA state.')]), dbc.Col()]),
+    dbc.Row([dbc.Col(), dbc.Col([dcc.Graph(figure=yoy_fig3(),  style={'display': 'inline-block'}),]), dbc.Col()]),
+    dbc.Row([dbc.Col(), dbc.Col([html.P('We can see from the figure that the number of unsheltered homeless is 90000 in 2007 which is 3 times more than the  number of Sheltered Total Homeless Individuals which is around 30000. We can see a sharp decrease in the number of unsheltered homeless (around 18000 less ) from 2008 to 2009. However, there is a slight increase in the number of sheltered homeless during that time. From 2012 to 2017 we see that the sheltered homeless count has a slight decreasing trend but the number of unsheltered homeless showed a larger increasing trend.')]), dbc.Col()]),
+
+    dbc.Row(style={'margin': '50px', 'border': '1px solid gray'}),
+    # fig 4
+    dbc.Row([dbc.Col(), dbc.Col([html.P('In this figure we tried to find out the trend between the overall homeless and sheltered total homeless for 5 different states which are also considered highly populated states.')]), dbc.Col()]),
+    dbc.Row([dbc.Col(), dbc.Col([dcc.Graph(figure=yoy_fig4(),  style={'display': 'inline-block'}),]), dbc.Col()]),
+    dbc.Row([dbc.Col(), dbc.Col([html.P('From the above figure it can be found that Both CA and NY have a large amount of Overall and Sheltered Total Homeless compared to the other 3 states. In particular, while the other states have a similar proportion of overall homeless and sheltered homeless, CA has more overall homeless than sheltered homeless, approximately 1million more than sheltered homeless.')]), dbc.Col()]),
+
+    dbc.Row(style={'margin': '50px', 'border': '1px solid gray'}),
+    # fig 5
+    dbc.Row([dbc.Col(), dbc.Col([html.P('In this figure we would like to analyze how the percentage of overall homeless changes over all the states in 2018. We assume to find a higher percentage for states CA and NY as they are known as two of the highest populated states. ')]), dbc.Col()]),
+    dbc.Row([dbc.Col(), dbc.Col([dcc.Graph(figure=yoy_fig5(),  style={'display': 'inline-block'}),]), dbc.Col()]),
+    dbc.Row([dbc.Col(), dbc.Col([html.P('We can see from the above figure that CA has the highest percentage of overall homeless having a percentage of 35.11. Where NY has  the second highest percentage of 24.8. So our assumption was correct.')]), dbc.Col()]),
+
+    dbc.Row(style={'margin': '50px', 'border': '1px solid gray'}),
+    # fig 6
+    dbc.Row([dbc.Col(), dbc.Col([html.P('In this figure, we would like to analyze the number of homeless in five categories over the years.')]), dbc.Col()]),
+    dbc.Row([dbc.Col(), dbc.Col([dcc.Graph(figure=yoy_fig6(),  style={'display': 'inline-block'}),]), dbc.Col()]),
+    dbc.Row([dbc.Col(), dbc.Col([html.P('From the above figure we can see that there was no chronically homeless people until 2011. Also there was no homeless accompanied youth under 18 and homeless children of parenting youth until 2014. The number of homeless family households showed a constant trend till 2012 and a small decrease after that. In 2009 and 2010, the number of homeless veterans was the highest and showed a decreasing trend afterwards.')]), dbc.Col()]),
+
+    dbc.Row(style={'margin': '50px', 'border': '1px solid gray'}),
+    # fig 7
+    dbc.Row([dbc.Col(), dbc.Col([html.P('In this section we wanted to see which state has the maximum number of overall homeless in each specific year and what is that count.')]), dbc.Col()]),
+    dbc.Row([dbc.Col(), dbc.Col([dcc.Graph(figure=yoy_fig7(),  style={'display': 'inline-block'}),]), dbc.Col()]),
+    dbc.Row([dbc.Col(), dbc.Col([html.P('It can be seen from the above figure that CA has the maximum number of overall homeless in all years. In 2007, the number was the highest, approximately 140000 overall homeless which tends to show a decreasing trend from 2009 to 2015. After 2015 the number started to increase again, having approximately 130000 overall homeless in 2018.')]), dbc.Col()]),
+
+    dbc.Row(style={'margin': '50px', 'border': '1px solid gray'}),
+    # fig 8
+    dbc.Row([dbc.Col(), dbc.Col([html.P('In this figure we analyzed how the percentage of different categories of homelessness differs among all the states in 2018.')]), dbc.Col()]),
+    dbc.Row([dbc.Col(), dbc.Col([dcc.Graph(figure=yoy_fig8(),  style={'display': 'inline-block'}),]), dbc.Col()]),
+    dbc.Row([dbc.Col(), dbc.Col([html.P('We can see that sheltered total homeless comprises the highest percentage 15.5% and sheltered ES homeless comprises 11.9% of the entire homeless counts. Around 7.8% are homeless people in families and 3.84% are chronically homeless individual.')]), dbc.Col()]),
 
     dbc.Row(style={'margin': '50px', 'border': '1px solid gray'}),
 
